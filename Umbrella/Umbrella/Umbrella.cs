@@ -9,18 +9,22 @@ namespace Umbrella
     public static class Umbrella
     {
         /// <summary>
-        /// Creates a DataTable that projects the given list.
+        /// Creates a DataTable that projects the given enumerable collection.
         /// </summary>
         /// <typeparam name="TEntity">Type of entity.</typeparam>
         /// <typeparam name="TProjection">Type produced by the projection.</typeparam>
-        /// <param name="list">Source list.</param>
+        /// <param name="source">Source collection.</param>
         /// <param name="projector">Defines the shape of the DataTable (its columns).</param>
         /// <returns>A filled DataTable with the columns listed by the projector.</returns>
-        public static DataTable ToDataTable<TEntity, TProjection>(this List<TEntity> list, Expression<Func<TEntity, TProjection>> projector)
+        public static DataTable ToDataTable<TEntity, TProjection>(this IEnumerable<TEntity> source, Expression<Func<TEntity, TProjection>> projector)
         {
-            // TODO: I should remove nested NewExpression/MemberInitExpression before visiting the projection (throw an exception i wuold say)
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
 
-            return UmbrellaDataTable<TEntity>.Build(list, projector);
+            if (projector == null)
+                throw new ArgumentNullException(nameof(projector));
+
+            return UmbrellaDataTable<TEntity>.Build(source, projector);
         }
     }
 }

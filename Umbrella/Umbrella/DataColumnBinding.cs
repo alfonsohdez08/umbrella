@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Umbrella
 {
-    public static class DataColumnBinding
+    internal static class DataColumnBinding
     {
         private class ProjectionVisitor : ExpressionVisitor
         {
@@ -89,6 +89,8 @@ namespace Umbrella
 
             private void BindColumnsExpressions(MemberInfo[] members, Expression[] expressions)
             {
+                CheckIfHasNestedObjInstantiator(expressions);
+
                 for (int index = 0; index < members.Length; index++)
                 {
                     PropertyInfo property = (PropertyInfo)members[index];
@@ -100,14 +102,32 @@ namespace Umbrella
                     _bindings.Add(column, lambdaExp.Compile());
                 }
             }
-        }
 
+            /// <summary>
+            /// Checks for nested object instatiator (expressions that denotes object instatiation).
+            /// </summary>
+            /// <param name="expressions">Set of expressions (immediate node expressions).</param>
+            private void CheckIfHasNestedObjInstantiator(Expression[] expressions)
+            {
+                for (int index = 0; index < expressions.Length; index++)
+                    if (expressions[index].IsObjectInstantiator())
+                        throw new InvalidOperationException("The projector can not have nested object instantiator.");
+            }
+        }
 
         public static Dictionary<DataColumn, Delegate> GetColumnsBinded(Expression projector)
         {
             var projectionVisitor = new ProjectionVisitor(projector);
 
             return projectionVisitor.GetBindings();
+        }
+    }
+
+    internal static class ExpressionExtensions
+    {
+        public static bool IsObjectInstantiator(this Expression e)
+        {
+            return e.NodeType == ExpressionType.New || e.NodeType == ExpressionType.MemberInit;
         }
     }
 }

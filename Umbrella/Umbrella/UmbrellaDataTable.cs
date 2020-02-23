@@ -13,25 +13,24 @@ namespace Umbrella
     internal class UmbrellaDataTable<T>
     {
         private readonly Expression _expression;
-        private readonly List<T> _list;
-        private readonly Dictionary<DataColumn, PropertyInfo> _columns = new Dictionary<DataColumn, PropertyInfo>();
+        private readonly IEnumerable<T> _source;
 
-        private UmbrellaDataTable(List<T> list, Expression expression)
+        private UmbrellaDataTable(IEnumerable<T> source, Expression expression)
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
 
             if (expression == null)
                 throw new ArgumentNullException(nameof(expression));
 
-            _list = list;
+            _source = source;
             _expression = expression;
 
         }
 
-        public static DataTable Build<TEntity>(List<TEntity> list, Expression projector)
+        public static DataTable Build<TEntity>(IEnumerable<TEntity> source, Expression projector)
         {
-            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(list, projector);
+            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projector);
 
             return umbrellaDataTable.GetDataTable();
         }
@@ -44,11 +43,13 @@ namespace Umbrella
             foreach (DataColumn c in bindings.Keys)
                 dataTable.Columns.Add(c);
 
-            foreach (T data in _list)
+            foreach (T data in _source)
             {
                 DataRow row = dataTable.NewRow();
                 foreach (var b in bindings)
                     row[b.Key] = b.Value.DynamicInvoke(data);
+
+                dataTable.Rows.Add(row);
             }
 
             return dataTable;

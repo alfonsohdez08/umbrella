@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella", "Umbrella\Umbrella.csproj", "{6BEA566C-60CE-4F5B-B2DB-689A10471586}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrela.UnitTests", "Umbrela.UnitTests\Umbrela.UnitTests.csproj", "{4CA4AEE4-4993-4A05-8E1A-ADAAF1271C77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella.UnitTests", "Umbrela.UnitTests\Umbrella.UnitTests.csproj", "{4CA4AEE4-4993-4A05-8E1A-ADAAF1271C77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
