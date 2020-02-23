@@ -38,30 +38,20 @@ namespace Umbrella.App
 
         private DataTable GetDataTable()
         {
-            ColumnCandidates cc = ProjectionVisitor.GetCandidates(_expression);
-            
-            LambdaExpression le = (LambdaExpression)_expression;
-            Type type = le.Body.Type;
-
-            Dictionary<DataColumn, Delegate> bindings = ColumnBindingsVisitor.GetColumnBindings(le.Body, type.GetProperties().ToList(), cc);
+            Dictionary<DataColumn, Delegate> bindings = DataColumnBinding.GetColumnsBinded(_expression);
 
             var dataTable = new DataTable();
-            foreach (DataColumn dc in bindings.Keys)
-            {
-                dataTable.Columns.Add(dc);
-            }
+            foreach (DataColumn c in bindings.Keys)
+                dataTable.Columns.Add(c);
 
             foreach (T data in _list)
             {
                 DataRow row = dataTable.NewRow();
-                foreach (var dcb in bindings)
-                    row[dcb.Key] = dcb.Value.DynamicInvoke(data);
-
-                dataTable.Rows.Add(row);
+                foreach (var b in bindings)
+                    row[b.Key] = b.Value.DynamicInvoke(data);
             }
 
             return dataTable;
         }
     }
-
 }

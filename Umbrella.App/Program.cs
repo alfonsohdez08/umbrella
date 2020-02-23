@@ -29,8 +29,8 @@ namespace Umbrella.App
                 new Order(){ Id = 4, Description = "SDA", IsShipped = true, Amount = 440}
             };
 
-            //var dataTable = orders.ToDataTable(o => new { o.Id, Desc = o.Description, o.Amount });
-            var dataTable = orders.ToDataTable(o => o); // this is failling
+            var dataTable = orders.ToDataTable(o => new { o.Id, Desc = o.Description, o.Amount });
+            //var dataTable = orders.ToDataTable(o => o); // this is failling
 
 
             Console.ReadLine();
