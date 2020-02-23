@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Umbrella.App
+namespace Umbrella
 {
     public static class Umbrella
     {

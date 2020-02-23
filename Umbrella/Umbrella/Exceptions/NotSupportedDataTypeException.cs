@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Umbrella.App.Exceptions
+namespace Umbrella.Exceptions
 {
     public class NotSupportedDataTypeException: Exception
     {

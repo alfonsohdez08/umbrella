@@ -5,10 +5,10 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Umbrella.App.Exceptions;
+using Umbrella.Exceptions;
 using System.Linq;
 
-namespace Umbrella.App
+namespace Umbrella
 {
     internal class UmbrellaDataTable<T>
     {
