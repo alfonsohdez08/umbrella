@@ -5,7 +5,6 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Umbrella.Exceptions;
 using System.Linq;
 
 namespace Umbrella
@@ -28,6 +27,13 @@ namespace Umbrella
 
         }
 
+        /// <summary>
+        /// Constructs a DataTable with the <paramref name="source"/>'s data and the columns encountered in the <paramref name="projector"/>.
+        /// </summary>
+        /// <typeparam name="TEntity">Type that contains the collection.</typeparam>
+        /// <param name="source">Source collection.</param>
+        /// <param name="projector">Columns projector.</param>
+        /// <returns>A filled DataTable.</returns>
         public static DataTable Build<TEntity>(IEnumerable<TEntity> source, Expression projector)
         {
             var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projector);
@@ -37,7 +43,7 @@ namespace Umbrella
 
         private DataTable GetDataTable()
         {
-            Dictionary<DataColumn, Delegate> bindings = DataColumnBinding.GetColumnsBinded(_expression);
+            Dictionary<DataColumn, Delegate> bindings = ColumnsMapping.GetColumns(_expression);
 
             var dataTable = new DataTable();
             foreach (DataColumn c in bindings.Keys)

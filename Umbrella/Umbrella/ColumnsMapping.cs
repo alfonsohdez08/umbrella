@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Umbrella
 {
-    internal static class DataColumnBinding
+    internal static class ColumnsMapping
     {
         private class ProjectionVisitor : ExpressionVisitor
         {
@@ -41,7 +41,7 @@ namespace Umbrella
                 for (int index = 0; index < members.Length; index++)
                     expressions[index] = Expression.MakeMemberAccess(p, members[index]);
 
-                BindColumnsExpressions(members, expressions);
+                MapColumns(members, expressions);
 
                 return p;
             }
@@ -69,7 +69,7 @@ namespace Umbrella
                     count++;
                 }
 
-                BindColumnsExpressions(members, expressions);
+                MapColumns(members, expressions);
 
                 return m;
             }
@@ -82,12 +82,12 @@ namespace Umbrella
                 MemberInfo[] members = new MemberInfo[n.Members.Count];
                 n.Members.CopyTo(members, 0);
 
-                BindColumnsExpressions(members, expressions);
+                MapColumns(members, expressions);
 
                 return n;
             }
 
-            private void BindColumnsExpressions(MemberInfo[] members, Expression[] expressions)
+            private void MapColumns(MemberInfo[] members, Expression[] expressions)
             {
                 CheckIfHasNestedObjInstantiator(expressions);
 
@@ -115,7 +115,15 @@ namespace Umbrella
             }
         }
 
-        public static Dictionary<DataColumn, Delegate> GetColumnsBinded(Expression projector)
+        /// <summary>
+        /// Retrieves the columns identified given a projector.
+        /// </summary>
+        /// <param name="projector">Defines the columns that would have the DataTable.</param>
+        /// <returns>A mapping set of System.Data.DataColumn and Delegate.</returns>
+        /// <remarks>
+        /// The Delegate represents the function required in order to fetch the data for in a specific column.
+        /// </remarks>
+        public static Dictionary<DataColumn, Delegate> GetColumns(Expression projector)
         {
             var projectionVisitor = new ProjectionVisitor(projector);
 

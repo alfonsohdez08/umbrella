@@ -9,9 +9,9 @@ namespace Umbrella
     public static class Umbrella
     {
         /// <summary>
-        /// Creates a DataTable that projects the given enumerable collection.
+        /// Creates a filled DataTable whose columns are inferred from a projection.
         /// </summary>
-        /// <typeparam name="TEntity">Type of entity.</typeparam>
+        /// <typeparam name="TEntity">Type that contains the collection.</typeparam>
         /// <typeparam name="TProjection">Type produced by the projection.</typeparam>
         /// <param name="source">Source collection.</param>
         /// <param name="projector">Defines the shape of the DataTable (its columns).</param>

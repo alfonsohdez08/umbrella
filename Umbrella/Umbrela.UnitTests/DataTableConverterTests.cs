@@ -25,13 +25,24 @@ namespace Umbrella.UnitTests
         }
 
         [TestMethod]
-        public void ToDataTable_PassAMemberInitProjection_ShouldGenerateDataTableBasedOnMembersInitialized()
+        public void ToDataTable_PassAKnownObjectConstructionAsProjector_ShouldGenerateDataTableBasedOnMembersInitialized()
         {
             Expression<Func<Product, Product>> projector = p => new Product() { Id = p.Id, Description = p.Description };
 
             DataTable dataTable = _products.ToDataTable(projector);
 
             Assert.IsTrue(dataTable.Columns.Contains("Id"));
+            Assert.IsTrue(dataTable.Columns.Contains("Description"));
+        }
+
+        [TestMethod]
+        public void ToDataTable_PassAnAnonymousProjector_ShouldGenerateDataTableBasedOnTheAnonymousTypeProperties()
+        {
+            Expression<Func<Product, object>> projector = p => new { ID = p.Id, p.Description };
+
+            DataTable dataTable = _products.ToDataTable(projector);
+
+            Assert.IsTrue(dataTable.Columns.Contains("ID"));
             Assert.IsTrue(dataTable.Columns.Contains("Description"));
         }
     }
