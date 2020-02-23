@@ -56,7 +56,12 @@ namespace Umbrella
                 {
                     MemberAssignment ma = mb as MemberAssignment;
                     if (ma == null)
-                        throw new InvalidOperationException("");
+                    {
+                        var invalidOpException = new InvalidOperationException("The member initialization only supports member assignment.");
+                        invalidOpException.HelpLink = "https://docs.microsoft.com/en-us/dotnet/api/system.linq.expressions.memberassignment?view=netstandard-2.0";
+
+                        throw invalidOpException;
+                    }
 
                     members[count] = ma.Member;
                     expressions[count] = ma.Expression;
