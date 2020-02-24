@@ -2,6 +2,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
 using Umbrella;
 
@@ -38,9 +39,12 @@ namespace Umbrella.UnitTests
         [TestMethod]
         public void ToDataTable_PassAnAnonymousProjector_ShouldGenerateDataTableBasedOnTheAnonymousTypeProperties()
         {
-            Expression<Func<Product, object>> projector = p => new { ID = p.Id, p.Description };
+            //Expression<Func<Product, object>> projector = p => new { ID = p.Id, p.Description };
+            //Expression<Func<Product, object>> projector2 = p =>  p.Id;
+            Expression<Func<Product, object>> projector = p => p;
 
             DataTable dataTable = _products.ToDataTable(projector);
+            //DataTable dataTable = _products.Select(p => new { ID = p.Id, Descripcion = p.Description }).ToDataTable(p => p);
 
             Assert.IsTrue(dataTable.Columns.Contains("ID"));
             Assert.IsTrue(dataTable.Columns.Contains("Description"));
