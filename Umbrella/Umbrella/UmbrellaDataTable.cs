@@ -12,7 +12,7 @@ namespace Umbrella
 {
     internal class UmbrellaDataTable<T>
     {
-        private readonly Expression _expression;
+        private readonly Expression _projector;
         private readonly IEnumerable<T> _source;
 
         private UmbrellaDataTable(IEnumerable<T> source, Expression expression)
@@ -24,7 +24,7 @@ namespace Umbrella
                 throw new ArgumentNullException(nameof(expression));
 
             _source = source;
-            _expression = expression;
+            _projector = expression;
 
         }
 
@@ -51,14 +51,17 @@ namespace Umbrella
 
         private class ProjectionParamRewritter: ExpressionVisitor
         {
-
             public Expression Rewrite(Expression projector)
             {
-                Expression body = projector.GetLambdaExpressionBody();
+                var lambdaExp = (LambdaExpression)projector;
 
-                var parameterExp = body as ParameterExpression;
-                if (parameterExp != null)
-                    return Visit(parameterExp);
+                var lambdaBody = lambdaExp.Body as ParameterExpression;
+                if (lambdaBody != null)
+                {
+                    Expression e = Visit(lambdaBody);
+
+                    return Expression.Lambda(e, lambdaExp.Parameters);
+                }
 
                 return projector;
             }
@@ -112,7 +115,7 @@ namespace Umbrella
 
         private DataTable GetDataTable()
         {
-            Dictionary<DataColumn, Delegate> bindings = ColumnsMapping.GetColumns(_expression);
+            Dictionary<DataColumn, Delegate> bindings = ColumnsMapping.GetColumns(_projector);
 
             var dataTable = new DataTable();
             foreach (DataColumn c in bindings.Keys)

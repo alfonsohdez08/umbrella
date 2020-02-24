@@ -49,6 +49,32 @@ namespace Umbrella.UnitTests
             Assert.IsTrue(dataTable.Columns.Contains("ID"));
             Assert.IsTrue(dataTable.Columns.Contains("Description"));
         }
+
+        [TestMethod]
+        public void ToDataTable_PassAMemberAccessAsProjector_ShouldGenerateADataTableWithMemberAccessedAsColumn()
+        {
+            //Expression<Func<Product, object>> projector = p => new { ID = p.Id, p.Description };
+            //Expression<Func<Product, object>> projector2 = p =>  p.Id;
+            //Expression<Func<Product, object>> projector = p => p.Id;
+
+            DataTable dataTable = _products.ToDataTable(p => p.Id);
+            //DataTable dataTable = _products.Select(p => new { ID = p.Id, Descripcion = p.Description }).ToDataTable(p => p);
+
+            Assert.IsTrue(dataTable.Columns.Contains("Id"));
+        }
+
+        [TestMethod]
+        public void ToDataTable_PassAParameterAsProjector_ShouldGenerateADataTableWithThePropertiesListedByTheStaticTypeOfTheParameter()
+        {
+            //Expression<Func<Product, object>> projector = p => new { ID = p.Id, p.Description };
+            //Expression<Func<Product, object>> projector2 = p =>  p.Id;
+            //Expression<Func<Product, object>> projector = p => p.Id;
+
+            DataTable dataTable = _products.ToDataTable(p => p);
+            //DataTable dataTable = _products.Select(p => new { ID = p.Id, Descripcion = p.Description }).ToDataTable(p => p);
+
+            Assert.IsTrue(dataTable.Columns.Contains("Id"));
+        }
     }
 
     internal static class DataTableHelper
