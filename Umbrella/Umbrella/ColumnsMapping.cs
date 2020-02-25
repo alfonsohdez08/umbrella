@@ -167,7 +167,28 @@ namespace Umbrella
                     column.Item2 = ((PropertyInfo)m.Member).PropertyType;
                 }
 
-                DataColumn dataColumn = new DataColumn(column.Item1, column.Item2); 
+                Type dataType = null;
+                bool allowsNull = false;
+
+                Type typeFromNullable = Nullable.GetUnderlyingType(column.Item2);
+                if (typeFromNullable != null)
+                {
+                    dataType = typeFromNullable;
+                    allowsNull = true;
+                }
+                else
+                {
+                    dataType = column.Item2;
+                }
+
+                DataColumn dataColumn = new DataColumn(column.Item1, dataType);
+                dataColumn.AllowDBNull = allowsNull;
+
+                //if (Nullable.GetUnderlyingType(column.Item2) != null)
+                //    dataColumn.AllowDBNull = true;
+                //else
+                //    dataColumn.AllowDBNull = false;
+
                 LambdaExpression le = Expression.Lambda(c.ColumnDefinition, _parameterExp);
 
                 Columns.Add(dataColumn, le.Compile());
