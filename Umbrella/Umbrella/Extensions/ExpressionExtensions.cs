@@ -17,5 +17,7 @@ namespace Umbrella.Extensions
 
             return le.Body;
         }
+
+        public static bool IsValidProjector(this Expression e) => e.NodeType == ExpressionType.Parameter || e.NodeType == ExpressionType.New || e.NodeType == ExpressionType.New; 
     }
 }

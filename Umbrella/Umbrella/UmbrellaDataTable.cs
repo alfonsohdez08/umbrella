@@ -42,6 +42,9 @@ namespace Umbrella
             if (!parameterExp.Type.IsComplexType())
                 throw new InvalidOperationException("The input type for the project is not a complex type.");
 
+            if (!projector.IsValidProjector())
+                throw new ArgumentException("The given projector is invalid. The projector should denote an object instantiation.");
+
             projector = ProjectorParameterRewritter.Rewrite(projector);
             //TODO: Add a local evaluator here, thus I avoid run constant expressions each time the delegate is invoked
 

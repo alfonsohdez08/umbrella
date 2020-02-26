@@ -10,7 +10,6 @@ namespace Umbrella.Visitors
 {
     public class ColumnsMappedVisitor : ColumnVisitor
     {
-        //public Dictionary<DataColumn, Delegate> Columns { get; private set; } = new Dictionary<DataColumn, Delegate>();
         public List<Column> Columns { get; private set; } = new List<Column>();
 
         private MemberInfo _memberInScope;
