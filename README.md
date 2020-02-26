@@ -4,6 +4,8 @@ Umbrella is a simple library that add the capability of convert an `IEnumerable`
 
 ## Installation
 
+...
+
 ## Usage
 
 Just import the `Umbrella` namespace in your class, and wherever you have an instance of an `IEnumerable`, you would be able to convert it as a `DataTable`.
@@ -78,7 +80,43 @@ Now **Umbrella** sees that it should create a `DataTable` of a single column cal
 | `(Order o) => new {o.Id, o.Description}` | `Id`, `Description`|
 | `(Order o) => o` | `Id`, `Description`, `Amount`, `Freight`, `IsShipped` |
 | `(Order o) => new Order(){Id = o.Id}` | `Id`|
-| `(int i ) => new {Identifier = i}` | `Identifier`|
+| `(int i) => new {Identifier = i}` | `Identifier`|
 
 #### How the data is mapped to the `DataTable`?
 
+Notice that the properties encountered in the projector are binded to an expression: either an expression that access the member of the input object, or an arithmethic expression, or a string operation and so on. Each one of these expressions are used to produce the value of a column when iterating over the `IEnumerable` instance: before start looping the collection, it compiles each binded expression as a `Delegate`, thus we end with a map of **Column - Delegate**; this delegate might be *parameterless or not* - depending if the underlying expression reference the projector's input object -, and it's invoked iteratively across all the collection's items. When executing all the delegates for a collection's item we end with a row, which is appended to the `DataTable`.
+
+Let's assume we have the following a set of Orders and we project them as:
+
+````csharp
+List<Order> orders = new List<Order>()
+{
+    new Order(){Id = 1, Description = "BMX", Amount = 24, Freight = 1, IsShipped = false},
+    new Order(){Id = 2, Description = "Toyota Corolla", Amount = 2211, Freight = 12, IsShipped = true},
+    new Order(){Id = 3, Description = "Yamaha Bike", Amount = 224, Freight = 4, IsShipped = false}
+};
+
+DataTable orderTable = orders.ToDataTable(o => new {o.Id, TotalAmount = o.Amount + o.Freight, Processed = true});
+````
+
+We would end with a table like this:
+
+| Id | TotalAmount | Processed |
+| - | - | - |
+| 1 | 25 | true |
+| 2 | 2223 | true |
+| 3 | 228 | true |
+
+How we ended with the `DataTable` already filled like the one above? We already know how the column discovery works: *each property within the projection represents a column*, but what the values listed below each columns... where they come from? They come from the source collection - the `IEnumerable` instance -, but each value is the output of a function that is already mapped to each column. See the data structure below used by **Umbrella** in order to map a column's mapper function:
+
+| Column | Mapper function *(seems as a lambda expression)* | Description |
+| - | - | - |
+| `Id` | `(Order o) => o.Id` | Returns the Order's `Id` value |
+| `TotalAmount` | `(Order o) => o.Amount + o.Freight` | Returns the sum of Order's `Amount` and `Freight` |
+| `Processed` | `() => true` | Always return `true` (notice it's a parameterless function due to it did not reference the projector's input object) |
+
+When dumping the data into the `DataTable`, the mapper function is looked up by the underlying column, and it's executed by passing as parameter - or not - the underlying collection's item.
+
+### Tips
+
+...
