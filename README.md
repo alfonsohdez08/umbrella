@@ -9,6 +9,10 @@ Umbrella is a simple library that add the capability of convert an `IEnumerable`
 Just import the `Umbrella` namespace in your class, and wherever you have an instance of an `IEnumerable`, you would be able to convert it as a `DataTable`.
 
 ````csharp
+using Umbrella;
+
+...
+
 public class Order
 {
     public long Id {get; set;}
@@ -17,10 +21,6 @@ public class Order
     public decimal Freight {get; set;}
     public bool IsShipped {get; set;}
 }
-````
-
-````csharp
-using Umbrella;
 
 ...
 
@@ -39,7 +39,7 @@ Notice the sum operation binded to the `NetAmount` column; that means that the s
 
 #### How Columns are inferred?
 
-When projecting objects, you have as input an object of type A and produce an object of type B by executing a function that shapes/transforms the input object into another one of type B. This function in the projection context would be a simple expression and it would be known as **projector**. For example, check the projection below:
+When projecting objects, you have as input an object of type A and produce an object of type B by executing a function that shapes/transforms the input object into another one. This function in the projection context is an expression and it would be known as **projector**. For example, check the projector below:
 
 ````csharp
 (Order o) => new {ID = o.Id, o.Description, TotalAmount = o.Amount}
@@ -49,7 +49,7 @@ From a C# standpoint, we're projecting an object where its properties are `ID`, 
 
 *Note: projection means create an object of type A into another of type B (object transformation).*
 
-You have to ensure that your projector produces an object, thus you would have properties in hand. There's an exception for this rule, and it's when your input type is already an object and your projector basically projects a member of the object without explicitily creating a new object - without using the `new` operator - . For instance:
+You have to ensure that your projector outputs an object no matter what, thus you would have properties in hand. There's an exception for this rule, and it's when your input type is already an object and your projector basically projects a member of the object without explicitily creating a new object - without using the `new` operator - . For instance:
 
 ````csharp
 (Order o) => o.Id
@@ -71,8 +71,14 @@ Now **Umbrella** sees that it should create a `DataTable` of a single column cal
 
 *Rule of thumb: if your input type isn't a complex one (an object), then ensure to wrap it as an object by using the `new` operator.*
 
-You can also project to known types and it would discover the columns based on the members initialized:
+##### Varieties of projectors (Cheatsheet)
 
-````csharp
-(Order o) => new Order(){Id = o.Id, Description = o.Description}
-````
+| Projector | Columns Inferred |
+| - | - |
+| `(Order o) => new {o.Id, o.Description}` | `Id`, `Description`|
+| `(Order o) => o` | `Id`, `Description`, `Amount`, `Freight`, `IsShipped` |
+| `(Order o) => new Order(){Id = o.Id}` | `Id`|
+| `(int i ) => new {Identifier = i}` | `Identifier`|
+
+#### How the data is mapped to the `DataTable`?
+
