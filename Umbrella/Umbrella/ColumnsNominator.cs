@@ -11,9 +11,9 @@ namespace Umbrella
         private readonly List<Expression> _expressions;
         private bool _isPartOfColumn = true;
 
-        public ColumnsNominator(Expression projector)
+        public ColumnsNominator(Expression projectorBody)
         {
-            _projector = projector.GetLambdaExpressionBody();
+            _projector = projectorBody;
             _expressions = new List<Expression>();
         }
 
@@ -22,9 +22,9 @@ namespace Umbrella
             Visit(_projector);
         }
 
-        public static List<Expression> GetCandidates(Expression projector)
+        public static List<Expression> GetCandidates(Expression projectorBody)
         {
-            var columnsNominator = new ColumnsNominator(projector);
+            var columnsNominator = new ColumnsNominator(projectorBody);
             columnsNominator.Nominate();
 
             return columnsNominator._expressions;

@@ -86,19 +86,62 @@ namespace Umbrella.Visitors
                 columnDataType = nullableType;
                 isNullable = true;
             }
-            
-            LambdaExpression le = Expression.Lambda(c.ColumnDefinition, _parameterExp);
+
+            LambdaExpression le = null;
+            bool isParameterless = MapperParameterVisitor.IsMapperFunctionParameterless(_parameterExp, c.ColumnDefinition);
+
+            if (isParameterless)
+                le = Expression.Lambda(c.ColumnDefinition);
+            else
+                le = Expression.Lambda(c.ColumnDefinition, _parameterExp);
+
             var column = new Column()
             {
                 Name = columnName,
                 DataType = columnDataType,
                 IsNullable = isNullable,
-                Mapper = le.Compile()
+                Mapper = le.Compile(),
+                IsParameterless = isParameterless
             };
 
             Columns.Add(column);
 
             return c;
+        }
+    }
+
+    public class MapperParameterVisitor: ExpressionVisitor
+    {
+        private readonly ParameterExpression _parameterExp;
+        private readonly Expression _mappingExpression;
+
+        private bool _foundParameter = false;
+
+        public MapperParameterVisitor(ParameterExpression parameterExp, Expression mappingExpression)
+        {
+            _parameterExp = parameterExp;
+            _mappingExpression = mappingExpression;
+        }
+
+        public void FindParameter()
+        {
+            Visit(_mappingExpression);
+        }
+
+        public static bool IsMapperFunctionParameterless(ParameterExpression parameter, Expression mappingExpression)
+        {
+            var mapperParameterVisitor = new MapperParameterVisitor(parameter, mappingExpression);
+            mapperParameterVisitor.FindParameter();
+
+            return !mapperParameterVisitor._foundParameter;
+        }
+
+        protected override Expression VisitParameter(ParameterExpression p)
+        {
+            if (_parameterExp == p)
+                _foundParameter = true;
+
+            return p;
         }
     }
 }

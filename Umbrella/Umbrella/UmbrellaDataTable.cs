@@ -67,7 +67,13 @@ namespace Umbrella
             {
                 DataRow row = dataTable.NewRow();
                 foreach (Column c in columns)
-                    row[c.Name] = c.Mapper.DynamicInvoke(data);
+                {
+                    if (c.IsParameterless)
+                        row[c.Name] = c.Mapper.DynamicInvoke();
+                    else
+                        row[c.Name] = c.Mapper.DynamicInvoke(data);
+
+                }
 
                 dataTable.Rows.Add(row);
             }
