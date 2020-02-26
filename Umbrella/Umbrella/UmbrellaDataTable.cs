@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Umbrella.Extensions;
+using Umbrella.Rewritters;
 
 namespace Umbrella
 {
@@ -15,17 +17,16 @@ namespace Umbrella
         private readonly Expression _projector;
         private readonly IEnumerable<T> _source;
 
-        private UmbrellaDataTable(IEnumerable<T> source, Expression expression)
+        private UmbrellaDataTable(IEnumerable<T> source, Expression projector)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
 
-            if (expression == null)
-                throw new ArgumentNullException(nameof(expression));
+            if (projector == null)
+                throw new ArgumentNullException(nameof(projector));
 
             _source = source;
-            _projector = expression;
-
+            _projector = projector;
         }
 
         /// <summary>
@@ -37,7 +38,13 @@ namespace Umbrella
         /// <returns>A filled DataTable.</returns>
         public static DataTable Build<TEntity>(IEnumerable<TEntity> source, Expression projector)
         {
-            projector = new ProjectionParamRewritter().Rewrite(projector);
+            ParameterExpression parameterExp = (projector as LambdaExpression).Parameters[0];
+            if (!parameterExp.Type.IsComplexType())
+                throw new InvalidOperationException("The input type for the project is not a complex type.");
+
+            projector = ProjectorParameterRewritter.Rewrite(projector);
+            //TODO: Add a local evaluator here, thus I avoid run constant expressions each time the delegate is invoked
+
             var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projector);
 
             return umbrellaDataTable.GetDataTable();
@@ -45,17 +52,22 @@ namespace Umbrella
 
         private DataTable GetDataTable()
         {
-            Dictionary<DataColumn, Delegate> bindings = ColumnsMapping.GetColumns(_projector);
+            List<Column> columns = ColumnsMapping.GetColumns(_projector);
 
             var dataTable = new DataTable();
-            foreach (DataColumn c in bindings.Keys)
-                dataTable.Columns.Add(c);
+            foreach (Column c in columns)
+            {
+                var dataColumn = new DataColumn(c.Name, c.DataType);
+                dataColumn.AllowDBNull = c.IsNullable;
+
+                dataTable.Columns.Add(dataColumn);
+            }
 
             foreach (T data in _source)
             {
                 DataRow row = dataTable.NewRow();
-                foreach (var b in bindings)
-                    row[b.Key] = b.Value.DynamicInvoke(data);
+                foreach (Column c in columns)
+                    row[c.Name] = c.Mapper.DynamicInvoke(data);
 
                 dataTable.Rows.Add(row);
             }

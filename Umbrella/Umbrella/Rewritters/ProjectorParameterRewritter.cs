@@ -29,7 +29,7 @@ namespace Umbrella.Rewritters
         public Expression Rewrite() => Visit(_projector);
 
         /// <summary>
-        /// Rewrites an expression of form (object o) => o into an instatiation expression (using new operator).
+        /// Rewrites an expression of form (object o) => o into an instantiation expression (using new operator).
         /// </summary>
         /// <param name="projector">Projector.</param>
         /// <returns>If it was not rewritten then returns the same projector; otherwise a new projector.</returns>
