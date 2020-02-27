@@ -22,7 +22,7 @@ namespace Umbrella
         {
             projector = PropertyColumnReplacement.ReplacePropertiesByColumns(projector);
 
-            return ColumnsMappedVisitor.GetMappedColumns(projector);
+            return ColumnsMapped.GetMappedColumns(projector);
         }
     }
 

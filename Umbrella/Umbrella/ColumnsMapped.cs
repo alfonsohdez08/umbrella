@@ -5,10 +5,11 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using Umbrella.Expressions;
+using Umbrella.Visitors;
 
-namespace Umbrella.Visitors
+namespace Umbrella
 {
-    public class ColumnsMappedVisitor : ColumnVisitor
+    public class ColumnsMapped : ColumnVisitor
     {
         public List<Column> Columns { get; private set; } = new List<Column>();
 
@@ -17,7 +18,7 @@ namespace Umbrella.Visitors
         private readonly ParameterExpression _parameterExp;
         private readonly Expression _projectorBody;
 
-        public ColumnsMappedVisitor(Expression projector)
+        public ColumnsMapped(Expression projector)
         {
             var lambdaExp = (LambdaExpression)projector;
 
@@ -27,7 +28,7 @@ namespace Umbrella.Visitors
 
         public static List<Column> GetMappedColumns(Expression projector)
         {
-            var columnsMappedVisitor = new ColumnsMappedVisitor(projector);
+            var columnsMappedVisitor = new ColumnsMapped(projector);
             columnsMappedVisitor.SetColumns();
 
             return columnsMappedVisitor.Columns;
