@@ -42,13 +42,14 @@ namespace Umbrella
 
             ParameterExpression parameterExp = projectorLambdaExp.Parameters[0];
             if (!parameterExp.Type.IsComplexType())
-                throw new InvalidOperationException("The input type for the project is not a complex type.");
+                throw new ArgumentException("The input type for the project is not a complex type.");
 
             Expression projectorBody = projectorLambdaExp.Body;
+            projectorBody = ProjectorParameterRewritter.Rewrite(projectorBody);
+
             if (!projectorBody.IsValidProjector())
                 throw new ArgumentException("The given projector is invalid. The projector should denote an object instantiation.");
 
-            projectorBody = ProjectorParameterRewritter.Rewrite(projectorBody);
             projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
 
             LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
