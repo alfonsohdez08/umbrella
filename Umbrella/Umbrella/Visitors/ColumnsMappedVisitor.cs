@@ -86,13 +86,24 @@ namespace Umbrella.Visitors
                 isNullable = true;
             }
 
+            Expression columnDefinition = c.ColumnDefinition;
+            var constantExp = columnDefinition as ConstantExpression;
+            if (constantExp != null && constantExp.Type == typeof(ColumnSettings))
+            {
+                var columnSettings = (ColumnSettings)constantExp.Value;
+
+                columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
+                columnName = columnSettings.ColumnName;
+                columnDataType = columnSettings.ColumnDataType;
+            }
+
             LambdaExpression le = null;
-            bool isParameterless = MapperParameterVisitor.IsMapperFunctionParameterless(_parameterExp, c.ColumnDefinition);
+            bool isParameterless = MapperParameterVisitor.IsMapperFunctionParameterless(_parameterExp, columnDefinition);
 
             if (isParameterless)
-                le = Expression.Lambda(c.ColumnDefinition);
+                le = Expression.Lambda(columnDefinition);
             else
-                le = Expression.Lambda(c.ColumnDefinition, _parameterExp);
+                le = Expression.Lambda(columnDefinition, _parameterExp);
 
             var column = new Column()
             {

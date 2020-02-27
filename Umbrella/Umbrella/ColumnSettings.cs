@@ -16,17 +16,18 @@ namespace Umbrella
         public string ColumnName => _columnName;
         public Type ColumnDataType => _columnDataType;
 
-        private ColumnSettings(Expression mapper)
+        private ColumnSettings(Expression mapper, Type columnDataType)
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));
 
             _mapper = mapper;
+            _columnDataType = columnDataType;
         }
 
         public static ColumnSettings Build<T>(Expression<Func<T>> columnProjector)
         {
-            var columnSettings = new ColumnSettings(columnProjector);
+            var columnSettings = new ColumnSettings(columnProjector, typeof(T));
 
             return columnSettings;
         }
