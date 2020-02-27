@@ -7,21 +7,22 @@ namespace Umbrella
 {
     public class ColumnSettings
     {
-        private Expression _mapper;
+        private readonly Expression _mapper;
+
         private string _columnName;
         private Type _columnDataType;
 
-        private ColumnSettings()
+        private ColumnSettings(Expression mapper)
         {
+            if (mapper == null)
+                throw new ArgumentNullException(nameof(mapper));
 
+            _mapper = mapper;
         }
 
         public static ColumnSettings Build<T>(Expression<Func<T>> columnProjector)
         {
-            var columnSettings = new ColumnSettings()
-            {
-                _mapper = columnProjector
-            };
+            var columnSettings = new ColumnSettings(columnProjector);
 
             return columnSettings;
         }
@@ -35,7 +36,7 @@ namespace Umbrella
 
         public ColumnSettings DataType(Type dataType)
         {
-            _columnDataType = dataType
+            _columnDataType = dataType;
 
             return this;
         }
