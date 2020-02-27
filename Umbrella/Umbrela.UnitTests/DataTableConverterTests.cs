@@ -75,8 +75,8 @@ namespace Umbrella.UnitTests
             new
             {   p.Id,
                 IsShipped = true,
-                FormattedId = p.Id + "2",
-                Test = ColumnSettings.Build(() => p.Id + p.Description).Name("Test").DataType(typeof(string))} );
+                Test = ColumnSettings.Build(() => p.Id + p.Description).Name("Test")
+            });
 
             Assert.IsTrue(dataTable.Columns.Contains("Id"));
         }
