@@ -69,9 +69,14 @@ namespace Umbrella.UnitTests
             //Expression<Func<Product, object>> projector = p => new { ID = p.Id, p.Description };
             //Expression<Func<Product, object>> projector2 = p =>  p.Id;
             //Expression<Func<Product, object>> projector = p => p.Id;
+            
 
-            DataTable dataTable = _products.ToDataTable(p => new { p.Id, IsShipped = true, FormattedId = p.Id + "2"} );
-            //DataTable dataTable = _products.Select(p => new { ID = p.Id, Descripcion = p.Description }).ToDataTable(p => p);
+            DataTable dataTable = _products.ToDataTable(p =>
+            new
+            {   p.Id,
+                IsShipped = true,
+                FormattedId = p.Id + "2",
+                Test = ColumnSettings.Build(() => p.Id + p.Description).Name("Test").DataType(typeof(string))} );
 
             Assert.IsTrue(dataTable.Columns.Contains("Id"));
         }
