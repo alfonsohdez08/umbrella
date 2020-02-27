@@ -44,15 +44,18 @@ namespace Umbrella
             if (!parameterExp.Type.IsComplexType())
                 throw new InvalidOperationException("The input type for the project is not a complex type.");
 
-            if (!projectorLambdaExp.Body.IsValidProjector())
+            Expression projectorBody = projectorLambdaExp.Body;
+            if (!projectorBody.IsValidProjector())
                 throw new ArgumentException("The given projector is invalid. The projector should denote an object instantiation.");
 
-            projector = ProjectorParameterRewritter.Rewrite(projector);
-            projector = ColumnSettingsRewritter.Rewrite(projector);
+            projectorBody = ProjectorParameterRewritter.Rewrite(projectorBody);
+            projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
+
+            LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
 
             //TODO: Add a local evaluator here, thus I avoid run constant expressions each time the delegate is invoked
 
-            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projector);
+            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projectorUpdated);
 
             return umbrellaDataTable.GetDataTable();
         }

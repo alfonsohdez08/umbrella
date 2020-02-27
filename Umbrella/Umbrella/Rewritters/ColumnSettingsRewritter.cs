@@ -15,14 +15,12 @@ namespace Umbrella.Rewritters
             _projectorBody = projectorBody;
         }
 
-        public static Expression Rewrite(Expression projector)
+        public static Expression Rewrite(Expression projectorBody)
         {
-            var lambdaExp = (LambdaExpression)projector;
+            var columnSettingsRewritter = new ColumnSettingsRewritter(projectorBody);
+            Expression projectorBodyUpdated = columnSettingsRewritter.Rewrite();
 
-            var columnSettingsRewritter = new ColumnSettingsRewritter(lambdaExp.Body);
-            Expression newProjectorBody = columnSettingsRewritter.Rewrite();
-
-            return Expression.Lambda(newProjectorBody, lambdaExp.Parameters);
+            return projectorBodyUpdated;
         }
 
         public Expression Rewrite()

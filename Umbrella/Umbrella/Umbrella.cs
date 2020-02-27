@@ -26,5 +26,11 @@ namespace Umbrella
 
             return UmbrellaDataTable<TEntity>.Build(source, projector);
         }
+
+        //public static DataTable ToDataTable<TEntity>(this IEnumerable<TEntity> source)
+        //{
+
+        //    return ToDataTable(source, null);
+        //}
     }
 }

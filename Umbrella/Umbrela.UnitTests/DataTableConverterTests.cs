@@ -75,7 +75,7 @@ namespace Umbrella.UnitTests
             new
             {   p.Id,
                 IsShipped = true,
-                Test = ColumnSettings.Build(() => p.Id + p.Description).Name("Test")
+                Test = ColumnSettings.Build(() => p.UnitPrice).Name("Test Column").DataType(typeof(float))
             });
 
             Assert.IsTrue(dataTable.Columns.Contains("Id"));

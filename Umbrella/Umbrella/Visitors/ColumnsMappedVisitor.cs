@@ -15,14 +15,14 @@ namespace Umbrella.Visitors
         private MemberInfo _memberInScope;
 
         private readonly ParameterExpression _parameterExp;
-        private readonly Expression _projector;
+        private readonly Expression _projectorBody;
 
         public ColumnsMappedVisitor(Expression projector)
         {
             var lambdaExp = (LambdaExpression)projector;
 
             _parameterExp = lambdaExp.Parameters[0];
-            _projector = lambdaExp.Body;
+            _projectorBody = lambdaExp.Body;
         }
 
         public static List<Column> GetMappedColumns(Expression projector)
@@ -35,7 +35,7 @@ namespace Umbrella.Visitors
 
         public void SetColumns()
         {
-            Visit(_projector);
+            Visit(_projectorBody);
         }
 
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment ma)
@@ -93,7 +93,7 @@ namespace Umbrella.Visitors
                 var columnSettings = (ColumnSettings)constantExp.Value;
 
                 columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
-                columnName = columnSettings.ColumnName;
+                columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
                 columnDataType = columnSettings.ColumnDataType;
             }
 

@@ -12,38 +12,36 @@ namespace Umbrella.Rewritters
     /// </summary>
     public class ProjectorParameterRewritter: ExpressionVisitor
     {
-        private readonly Expression _projector;
+        private readonly Expression _projectorBody;
 
-        private ProjectorParameterRewritter(Expression projector)
+        private ProjectorParameterRewritter(Expression projectorBody)
         {
-            if (projector == null)
-                throw new ArgumentNullException(nameof(projector));
+            if (projectorBody == null)
+                throw new ArgumentNullException(nameof(projectorBody));
 
-            var parameterExp = projector as ParameterExpression;
+            var parameterExp = projectorBody as ParameterExpression;
             if (parameterExp != null)
-                _projector = parameterExp;
+                _projectorBody = parameterExp;
             else
-                _projector = null;
+                _projectorBody = null;
         }
 
-        public Expression Rewrite() => Visit(_projector);
+        public Expression Rewrite() => Visit(_projectorBody);
 
         /// <summary>
         /// Rewrites an expression of form (object o) => o into an instantiation expression (using new operator).
         /// </summary>
-        /// <param name="projector">Projector.</param>
+        /// <param name="projectorBody">Projector's body expression.</param>
         /// <returns>If it was not rewritten then returns the same projector; otherwise a new projector.</returns>
-        public static Expression Rewrite(Expression projector)
+        public static Expression Rewrite(Expression projectorBody)
         {
-            var lambdaExp = (LambdaExpression)projector;
+            var projectorParamRewritter = new ProjectorParameterRewritter(projectorBody);
+            Expression projectorBodyUpdated = projectorParamRewritter.Rewrite();
 
-            var projectorParamRewritter = new ProjectorParameterRewritter(lambdaExp.Body);
-            Expression newProjector = projectorParamRewritter.Rewrite();
+            if (projectorBodyUpdated == null)
+                return projectorBody;
 
-            if (newProjector == null)
-                return projector;
-
-            return Expression.Lambda(newProjector, lambdaExp.Parameters);
+            return projectorBodyUpdated;
         }
 
         protected override Expression VisitParameter(ParameterExpression p)
