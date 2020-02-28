@@ -8,7 +8,7 @@ using System.Text;
 namespace Umbrella.UnitTests
 {
     [TestClass]
-    public class DataTableTests
+    public class ColumnsGeneratedTests
     {
         private IEnumerable<Person> _people;
 
@@ -31,7 +31,7 @@ namespace Umbrella.UnitTests
 
             DataTable peopleDataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(peopleDataTable.HasAllColumns("ID", "FirstName", "LastName", "DOB"));
+            Assert.IsTrue(peopleDataTable.HasColumns("ID", "FirstName", "LastName", "DOB"));
         }
 
         [TestMethod]
@@ -41,7 +41,7 @@ namespace Umbrella.UnitTests
 
             DataTable peopleDataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(peopleDataTable.HasAllColumns("Id", "IsAlive"));
+            Assert.IsTrue(peopleDataTable.HasColumns("Id", "IsAlive"));
         }
 
         [TestMethod]
@@ -51,7 +51,7 @@ namespace Umbrella.UnitTests
 
             DataTable peopleDataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(peopleDataTable.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DOB", "DateOfBirth"));
+            Assert.IsTrue(peopleDataTable.HasColumns("Id", "FirstName", "LastName", "IsAlive", "DOB", "DateOfBirth"));
         }
 
         [TestMethod]
@@ -64,11 +64,33 @@ namespace Umbrella.UnitTests
 
             Assert.ThrowsException<ArgumentException>(toDataTable);
         }
+
+        [TestMethod]
+        public void ToDataTable_ProjectToAnAnonymousTypeThatHasAColumnCustomized_ShouldGenerateTheCustomizedDtColumnAccordingToTheProjection()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { ID = ColumnSettings.Build(() => p.Id + 1).Name("ID Modified") };
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            Assert.IsTrue(dataTable.HasColumns("ID Modified"));
+        }
+
+        [TestMethod]
+        public void ToDataTable_ProjectANestedObject_ShouldThrowAnExceptionIndicatingThatItsAnInvalidProjector()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { Id = new { p.Id } };
+
+            Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
+
+            Assert.ThrowsException<Exception>(toDataTable);
+        }
+
+
     }
 
     public static class DataTableExtensions
     {
-        public static bool HasAllColumns(this DataTable dataTable, params string[] columns)
+        public static bool HasColumns(this DataTable dataTable, params string[] columns)
         {
             for (int index = 0; index < columns.Length; index++)
             {
