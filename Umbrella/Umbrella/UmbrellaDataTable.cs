@@ -47,14 +47,15 @@ namespace Umbrella
             Expression projectorBody = projectorLambdaExp.Body;
             projectorBody = ProjectorParameterRewritter.Rewrite(projectorBody);
 
+            //Local evaluation
+            projectorBody = LocalEvaluator.Evaluate(projectorBody, parameterExp);
+
             if (!projectorBody.IsValidProjector())
                 throw new ArgumentException("The given projector is invalid. The projector should denote an object instantiation.");
 
             projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
 
             LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
-
-            //TODO: Add a local evaluator here, thus I avoid run constant expressions each time the delegate is invoked
 
             var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projectorUpdated);
 

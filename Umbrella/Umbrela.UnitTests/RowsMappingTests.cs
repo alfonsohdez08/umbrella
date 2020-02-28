@@ -48,6 +48,61 @@ namespace Umbrella.UnitTests
 
             Assert.IsTrue(ValidateRowsAreMapped(_people, dataTable, (p, r) => p.DateOfBirth == (DateTime)r["DateOfBirth"]));
         }
+
+        [TestMethod]
+        public void ToDataTable_PassAStaticMethodInTheProjector_ShouldRunLocallyThatMethodAndTreatItsResultAsAConstant()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { p.Id, BornPlace = Place.GetPlace()};
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            Assert.IsTrue(
+                ValidateRowsAreMapped(_people.Select(p => new { p.Id, BornPlace = Place.GetPlace() }), dataTable, (p, r) => p.BornPlace == (string)r["BornPlace"])
+            );
+        }
+
+        [TestMethod]
+        public void ToDataTable_PassAnInstanceMethodInTheProjector_ShouldRunLocallyTheMethodAndTreatItsResultAsAConstant()
+        {
+            var place = new Place();
+            Expression<Func<Person, dynamic>> projector = p => new { BornPlace = place.GetPlace(false), p.IsAlive};
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            Assert.IsTrue(
+                ValidateRowsAreMapped(_people.Select(p => new { BornPlace = place.GetPlace(false)}), dataTable, (p, r) => p.BornPlace == (string)r["BornPlace"])
+                );
+        }
+
+        [TestMethod]
+        public void ToDataTable_PassAConstantAsProjector_ShouldThrowAnExceptionBecauseTheProjectorIsNotReferencingAnyInputTypeProperty()
+        {
+            var place = new Place();
+            Expression<Func<Person, dynamic>> projector = p => new { Place = place.GetPlace(true) };
+
+            Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
+
+            Assert.ThrowsException<InvalidOperationException>(toDataTable);
+        }
+    }
+
+    // mock class
+    public class Place
+    {
+        public string Current => GetPlace();
+
+        public string GetPlace(bool callStaticMethod = false)
+        {
+            if (callStaticMethod)
+                return GetPlace();
+
+            return "US";
+        }
+
+        public static string GetPlace()
+        {
+            return "USA";
+        }
     }
 
     public static class RowsMappingHelper
