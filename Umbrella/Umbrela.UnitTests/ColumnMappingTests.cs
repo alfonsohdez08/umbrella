@@ -8,7 +8,7 @@ using System.Text;
 namespace Umbrella.UnitTests
 {
     [TestClass]
-    public class ColumnsGeneratedTests
+    public class ColumnMappingTests
     {
         private IEnumerable<Person> _people;
 
@@ -86,21 +86,5 @@ namespace Umbrella.UnitTests
         }
 
 
-    }
-
-    public static class DataTableExtensions
-    {
-        public static bool HasColumns(this DataTable dataTable, params string[] columns)
-        {
-            for (int index = 0; index < columns.Length; index++)
-            {
-                string columnName = columns[index];
-
-                if (!dataTable.Columns.Contains(columnName))
-                    return false;
-            }
-
-            return true;
-        }
     }
 }
