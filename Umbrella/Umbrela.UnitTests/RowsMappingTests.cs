@@ -84,6 +84,16 @@ namespace Umbrella.UnitTests
 
             Assert.ThrowsException<InvalidOperationException>(toDataTable);
         }
+
+        [TestMethod]
+        public void ToDataTable_PassAProjectorThatHasNestedInstantiationInIt_ShouldThrowAnExceptionBecauseNestedObjectsInAProjectorIsInvalid()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { p.Id, OuterObj = new { p.IsAlive } };
+
+            Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
+
+            Assert.ThrowsException<InvalidOperationException>(toDataTable);
+        }
     }
 
     // mock class

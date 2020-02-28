@@ -50,8 +50,7 @@ namespace Umbrella
             //Local evaluation
             projectorBody = LocalEvaluator.Evaluate(projectorBody, parameterExp);
 
-            if (!projectorBody.IsValidProjector())
-                throw new ArgumentException("The given projector is invalid. The projector should denote an object instantiation.");
+            ProjectorValidator.Validate(projectorBody);
 
             projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
 
