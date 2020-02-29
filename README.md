@@ -117,6 +117,21 @@ How we ended with the `DataTable` already filled like the one above? We already 
 
 When dumping the data into the `DataTable`, the mapper function is looked up by the underlying column, and it's executed by passing as parameter - or not - the underlying collection's item.
 
+
+### Why you would use this library?
+
+The process for create a `DataTable` can be tedious: initialize the table, create the `DataColumn`s by specifying its name and data type, create a `DataRow` per each entry and map the entry's values to the row, and finally append the `DataRow` to the table. This process can be really cumbersome when dealing with a dataset that has numerous columns. That's one of the situations where `Umbrella` takes action: creates `DataTable` with data in it from an `IEnumerable` instance and a .NET projection.
+
+I have seen solutions about how to convert a `List` to a `DataTable` where the generic type of the `List` is reflected in order to fetch its properties and use them as columns for the table. Although this solution might satisfy a bunch of scenarios, you're coupling your underlying type to the table generation. The way `Umbrella` generates the table it's different even though it uses reflection behind of scenes: you project an object that would represent your `DataTable` schema and the values that should be allocated in each column. This approach provides you the control of **what are going to be your columns** and **how your data should be mapped to each column when creating a row**.
+
+For instance, using a projector helps in:
+
+- Infering your column's name - or you can specifiy your own name.
+- Having a projector per each column that denotes how the data is mapped from the collection into each column - a mapping expression.
+- Infering the column's data type based on the column's projector - or you can specify it by yourself.
+
+The main purpose of writting this library is boost your productivity as Developer and reduce the lines of codes required for manipulate `DataTable`s - which might increase the readibility of your code.
+
 ### Tips
 
 ...

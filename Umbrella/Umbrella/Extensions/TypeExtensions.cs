@@ -26,16 +26,18 @@ namespace Umbrella.Extensions
         /// Determines whether a given type is a complex structure or not.
         /// </summary>
         /// <param name="type">Type that would be evaluated.</param>
-        /// <returns>True if it's an object; otherwise false.</returns>
+        /// <returns>True if it's a complex type; otherwise false.</returns>
+        /// <remarks>
+        /// A complex type is either a struct, an user defined type or an anonymous type. It's basically an object that has state and properties.
+        /// </remarks>
         public static bool IsComplexType(this Type type)
         {
-            //TODO: review more about reflections
+            bool isStruct = !type.IsPrimitive && type.IsValueType;
+            bool isReferenceType = !type.IsValueType && (type != typeof(string));
 
-            /*
-                Any type that allows an object construction it's valid: it's not only a refernece type, it can be even a value type (a struct).
-             */
-
-            return !type.IsValueType && (type != typeof(string));
+            return isStruct || isReferenceType;
         }
+
+
     }
 }
