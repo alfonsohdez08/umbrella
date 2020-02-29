@@ -18,9 +18,6 @@ namespace Umbrella
 
             var nestedObjectValidator = new ProjectorNestedObjectValidator();
             nestedObjectValidator.Visit(projectorBody);
-
-            // Check if the constant expressions has valid types?
-
         }
     }
 

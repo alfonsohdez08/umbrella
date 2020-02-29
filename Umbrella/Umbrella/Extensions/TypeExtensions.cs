@@ -38,6 +38,5 @@ namespace Umbrella.Extensions
             return isStruct || isReferenceType;
         }
 
-
     }
 }
