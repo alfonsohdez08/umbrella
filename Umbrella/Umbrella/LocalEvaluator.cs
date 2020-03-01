@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using Umbrella.Extensions;
 
 namespace Umbrella
 {
@@ -42,10 +43,12 @@ namespace Umbrella
             if (node == null)
                 return node;
 
-            if (_candidates.Contains(node))
+            if (_candidates.Contains(node) && node.Type.IsBuiltInType())
             {
                 LambdaExpression le = Expression.Lambda(node, null);
                 Delegate del = le.Compile();
+
+                // rebrand the replacer rewritter and visitors... they look to complex in order to use it
 
                 return Expression.Constant(del.DynamicInvoke());
             }

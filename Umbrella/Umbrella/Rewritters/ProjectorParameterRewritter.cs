@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -69,7 +70,7 @@ namespace Umbrella.Rewritters
                 ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
                 NewExpression ne = Expression.New(constructor);
 
-                PropertyInfo[] properties = type.GetProperties();
+                PropertyInfo[] properties = type.GetProperties().Where(pr => pr.CanWrite && pr.PropertyType.IsBuiltInType()).ToArray();
                 List<MemberBinding> memberBindings = new List<MemberBinding>();
 
                 for (int index = 0; index < properties.Length; index++)
@@ -85,7 +86,7 @@ namespace Umbrella.Rewritters
                 return mi;
             }
 
-            throw new InvalidOperationException("The projector's input type is not a complex type (an object).");
+            throw new InvalidOperationException("The projector's input type is not a complex type.");
         }
 
     }

@@ -50,7 +50,7 @@ namespace Umbrella
             //Local evaluation
             projectorBody = LocalEvaluator.Evaluate(projectorBody, parameterExp);
 
-            ProjectorValidator.Validate(projectorBody);
+            ProjectorValidator.Validate(projectorBody, parameterExp);
 
             projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
 

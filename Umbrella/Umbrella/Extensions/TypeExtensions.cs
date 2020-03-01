@@ -33,9 +33,19 @@ namespace Umbrella.Extensions
         public static bool IsComplexType(this Type type)
         {
             bool isStruct = !type.IsPrimitive && type.IsValueType;
-            bool isReferenceType = !type.IsValueType && (type != typeof(string));
+            bool isReferenceType = !type.IsValueType && (type != typeof(string) || type != typeof(DateTime));
 
             return isStruct || isReferenceType;
+        }
+
+        /// <summary>
+        /// Determines whether a given type is a built-in type from .NET framework.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <returns>True if it's a built-in type; otherwise false.</returns>
+        public static bool IsBuiltInType(this Type type)
+        {
+            return type.IsPrimitive || type == typeof(string) || type == typeof(DateTime);
         }
 
     }

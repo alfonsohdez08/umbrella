@@ -51,7 +51,7 @@ namespace Umbrella.UnitTests
 
             DataTable peopleDataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(peopleDataTable.HasColumns("Id", "FirstName", "LastName", "IsAlive", "DOB", "DateOfBirth"));
+            Assert.IsTrue(peopleDataTable.HasColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
         }
 
         [TestMethod]
@@ -68,7 +68,7 @@ namespace Umbrella.UnitTests
         [TestMethod]
         public void ToDataTable_ProjectToAnAnonymousTypeThatHasAColumnCustomized_ShouldGenerateTheCustomizedDtColumnAccordingToTheProjection()
         {
-            Expression<Func<Person, dynamic>> projector = p => new { ID = ColumnSettings.Build(() => p.Id + 1).Name("ID Modified") };
+            Expression<Func<Person, dynamic>> projector = p => new {p.Id, ID = ColumnSettings.Build(() => 1).Name("ID Modified") };
 
             DataTable dataTable = _people.ToDataTable(projector);
 
@@ -82,9 +82,18 @@ namespace Umbrella.UnitTests
 
             Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
 
-            Assert.ThrowsException<Exception>(toDataTable);
+            Assert.ThrowsException<InvalidOperationException>(toDataTable);
         }
 
+        //[TestMethod]
+        //public void ToDataTable_ProjectAnInvalidType_ShouldThrowAnExceptionIndicatingThatTheGivenTypeIsInvalidForADataColumn()
+        //{
+        //    Expression<Func<Person, dynamic>> projector = p => new { p.Id, p.SSN };
+
+        //    Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
+
+        //    Assert.ThrowsException<Exception>(toDataTable);
+        //}
 
     }
 }

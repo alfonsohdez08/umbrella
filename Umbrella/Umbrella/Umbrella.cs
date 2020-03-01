@@ -29,8 +29,9 @@ namespace Umbrella
 
         //public static DataTable ToDataTable<TEntity>(this IEnumerable<TEntity> source)
         //{
+        //    ParameterExpression paramExp = Expression.Parameter(typeof(TEntity), "x");
 
-        //    return ToDataTable(source, null);
+        //    return ToDataTable(source, paramExp);
         //}
     }
 }
