@@ -6,53 +6,58 @@ using Umbrella.Extensions;
 
 namespace Umbrella.Rewritters
 {
-    public class ColumnSettingsRewritter: ExpressionVisitor
+    public class ColumnSettingsRewritter : ExpressionRewritter
     {
-        private readonly Expression _projectorBody;
 
-        public ColumnSettingsRewritter(Expression projectorBody)
+
+        //private readonly Expression _projectorBody;
+
+        //public ColumnSettingsRewritter(Expression projectorBody)
+        //{
+        //    _projectorBody = projectorBody;
+        //}
+
+        //public static Expression Rewrite(Expression projectorBody)
+        //{
+        //    var columnSettingsRewritter = new ColumnSettingsRewritter(projectorBody);
+        //    Expression projectorBodyUpdated = columnSettingsRewritter.Rewrite();
+
+        //    return projectorBodyUpdated;
+        //}
+
+        //public Expression Rewrite()
+        //{
+        //    return Visit(_projectorBody);
+        //}
+
+        //protected override Expression VisitMethodCall(MethodCallExpression mc)
+        //{
+        //    if (mc.Type == typeof(ColumnSettings) && mc.Method.Name == "Build")
+        //    {
+        //        var expQuoted = (UnaryExpression)mc.Arguments[0];
+        //        var mapperLambdaExp = (LambdaExpression)expQuoted.Operand;
+
+        //        // why this throws an exception? (research this)
+        //        //var x = Expression.Call(null, mc.Method, new Expression[] {mapperLambdaExp});
+
+        //        var columnSettings = typeof(ColumnSettings).GetMethod("Build").MakeGenericMethod(mapperLambdaExp.Body.Type).Invoke(null, new object[] { mapperLambdaExp });
+
+        //        return Expression.Constant(columnSettings, typeof(ColumnSettings));
+        //    }else if (mc.Type == typeof(ColumnSettings))
+        //    {
+        //        Expression e = base.VisitMethodCall(mc);
+        //        LambdaExpression le = Expression.Lambda(e);
+
+        //        var columnSettings = (ColumnSettings)le.Compile().DynamicInvoke();
+
+        //        return Expression.Constant(columnSettings, typeof(ColumnSettings));
+        //    }
+
+        //    return base.VisitMethodCall(mc);
+        //}
+        public override Expression Rewrite(Expression expression)
         {
-            _projectorBody = projectorBody;
+            throw new NotImplementedException();
         }
-
-        public static Expression Rewrite(Expression projectorBody)
-        {
-            var columnSettingsRewritter = new ColumnSettingsRewritter(projectorBody);
-            Expression projectorBodyUpdated = columnSettingsRewritter.Rewrite();
-
-            return projectorBodyUpdated;
-        }
-
-        public Expression Rewrite()
-        {
-            return Visit(_projectorBody);
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression mc)
-        {
-            if (mc.Type == typeof(ColumnSettings) && mc.Method.Name == "Build")
-            {
-                var expQuoted = (UnaryExpression)mc.Arguments[0];
-                var mapperLambdaExp = (LambdaExpression)expQuoted.Operand;
-
-                // why this throws an exception? (research this)
-                //var x = Expression.Call(null, mc.Method, new Expression[] {mapperLambdaExp});
-
-                var columnSettings = typeof(ColumnSettings).GetMethod("Build").MakeGenericMethod(mapperLambdaExp.Body.Type).Invoke(null, new object[] { mapperLambdaExp });
-
-                return Expression.Constant(columnSettings, typeof(ColumnSettings));
-            }else if (mc.Type == typeof(ColumnSettings))
-            {
-                Expression e = base.VisitMethodCall(mc);
-                LambdaExpression le = Expression.Lambda(e);
-
-                var columnSettings = (ColumnSettings)le.Compile().DynamicInvoke();
-
-                return Expression.Constant(columnSettings, typeof(ColumnSettings));
-            }
-
-            return base.VisitMethodCall(mc);
-        }
-
     }
 }

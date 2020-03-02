@@ -48,8 +48,6 @@ namespace Umbrella
                 LambdaExpression le = Expression.Lambda(node, null);
                 Delegate del = le.Compile();
 
-                // rebrand the replacer rewritter and visitors... they look to complex in order to use it
-
                 return Expression.Constant(del.DynamicInvoke());
             }
 
