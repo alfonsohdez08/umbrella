@@ -11,40 +11,8 @@ namespace Umbrella.Rewritters
     /// <summary>
     /// Rewrittes a projector that has as body a ParameterExpression.
     /// </summary>
-    public class ProjectorParameterRewritter: ExpressionVisitor
+    public class ParameterProjectedRewritter : ExpressionRewritter
     {
-        private readonly Expression _projectorBody;
-
-        private ProjectorParameterRewritter(Expression projectorBody)
-        {
-            if (projectorBody == null)
-                throw new ArgumentNullException(nameof(projectorBody));
-
-            var parameterExp = projectorBody as ParameterExpression;
-            if (parameterExp != null)
-                _projectorBody = parameterExp;
-            else
-                _projectorBody = null;
-        }
-
-        public Expression Rewrite() => Visit(_projectorBody);
-
-        /// <summary>
-        /// Rewrites an expression of form (object o) => o into an instantiation expression (using new operator).
-        /// </summary>
-        /// <param name="projectorBody">Projector's body expression.</param>
-        /// <returns>If it was not rewritten then returns the same projector; otherwise a new projector.</returns>
-        public static Expression Rewrite(Expression projectorBody)
-        {
-            var projectorParamRewritter = new ProjectorParameterRewritter(projectorBody);
-            Expression projectorBodyUpdated = projectorParamRewritter.Rewrite();
-
-            if (projectorBodyUpdated == null)
-                return projectorBody;
-
-            return projectorBodyUpdated;
-        }
-
         protected override Expression VisitParameter(ParameterExpression p)
         {
             Type type = p.Type;
@@ -89,5 +57,13 @@ namespace Umbrella.Rewritters
             throw new InvalidOperationException("The projector's input type is not a complex type.");
         }
 
+        public override Expression Rewrite(Expression expression)
+        {
+            bool isParameterProjected = expression is ParameterExpression;
+            if (isParameterProjected)
+                return Visit(expression);
+
+            return expression;
+        }
     }
 }

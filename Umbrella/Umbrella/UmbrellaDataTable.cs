@@ -45,7 +45,15 @@ namespace Umbrella
                 throw new ArgumentException("The input type for the project is not a complex type.");
 
             Expression projectorBody = projectorLambdaExp.Body;
-            projectorBody = ProjectorParameterRewritter.Rewrite(projectorBody);
+            var parameterProjectedRewritter = new ParameterProjectedRewritter();
+            projectorBody = parameterProjectedRewritter.Rewrite(projectorBody);
+
+            /*
+                A projection should be flat (no nested object instantiation) and the properties data types should be primitive or string, datetime.
+                
+                The projection validation should happen once the rewritting and local evaluation happened.
+            */
+
 
             //Local evaluation
             projectorBody = LocalEvaluator.Evaluate(projectorBody, parameterExp);
