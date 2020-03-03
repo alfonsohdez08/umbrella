@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using Umbrella.Expr;
 using Umbrella.Expr.Column;
+using Umbrella.Extensions;
 
 namespace Umbrella
 {
@@ -88,6 +89,9 @@ namespace Umbrella
                 columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
                 columnDataType = columnSettings.ColumnDataType;
             }
+
+            if (!columnDataType.IsBuiltInType())
+                throw new InvalidOperationException("The column data type is not valid.");
 
             LambdaExpression le = null;
             bool isParameterless = !_parameterFinder.Find(columnDefinition, _parameter);
