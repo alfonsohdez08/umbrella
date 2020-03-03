@@ -10,7 +10,7 @@ using Umbrella.Extensions;
 
 namespace Umbrella
 {
-    public class ColumnsMapped: ColumnVisitor
+    internal class ColumnsMapped: ColumnVisitor
     {
         private readonly List<Column> _columns = new List<Column>();
         private readonly ParameterExpression _parameter;

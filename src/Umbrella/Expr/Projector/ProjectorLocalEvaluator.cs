@@ -7,7 +7,7 @@ using Umbrella.Expr.Nominators;
 
 namespace Umbrella.Expr.Projector
 {
-    public class ProjectorLocalEvaluator: ExpressionVisitor
+    internal class ProjectorLocalEvaluator: ExpressionVisitor
     {
         private HashSet<Expression> _nominees;
 

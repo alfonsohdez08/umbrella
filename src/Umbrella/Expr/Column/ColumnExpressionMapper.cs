@@ -6,7 +6,7 @@ using Umbrella.Expr.Nominators;
 
 namespace Umbrella.Expr.Column
 {
-    public class ColumnExpressionMapper: ExpressionVisitor
+    internal class ColumnExpressionMapper: ExpressionVisitor
     {
         private HashSet<Expression> _nominatedColumns = new HashSet<Expression>();
 

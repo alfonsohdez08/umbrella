@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Umbrella.Expr.Rewritters
 {
-    public abstract class ExpressionRewritter: ExpressionVisitor
+    internal abstract class ExpressionRewritter: ExpressionVisitor
     {
         public abstract Expression Rewrite(Expression expression);
     }

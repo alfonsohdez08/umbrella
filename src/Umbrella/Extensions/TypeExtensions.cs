@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Umbrella.Extensions
 {
-    public static class TypeExtension
+    internal static class TypeExtension
     {
 
         /// <summary>

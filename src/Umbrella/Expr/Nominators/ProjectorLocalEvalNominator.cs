@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Umbrella.Expr.Nominators
 {
-    public class ProjectorLocalEvalNominator : Nominator
+    internal class ProjectorLocalEvalNominator : Nominator
     {
         private readonly ParameterExpression _parameter;
 

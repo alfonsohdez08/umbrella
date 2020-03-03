@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Umbrella
 {
-    public class Column
+    internal class Column
     {
         public string Name { get; set; }
         public Type DataType { get; set; }

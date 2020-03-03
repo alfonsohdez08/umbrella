@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Umbrella.Expr.Projector
 {
-    public static class ProjectorValidator
+    internal static class ProjectorValidator
     {
         /// <summary>
         /// Checks if the projector's is a flat projector and the columns projected are primitives.

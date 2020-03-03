@@ -4,7 +4,7 @@ using Umbrella.Extensions;
 
 namespace Umbrella.Expr.Nominators
 {
-    public class ColumnsNominator : Nominator
+    internal class ColumnsNominator : Nominator
     {
         private HashSet<Expression> _nominees = new HashSet<Expression>();
         private bool _isPartOfColumn = true;

@@ -6,7 +6,7 @@ using Umbrella.Extensions;
 
 namespace Umbrella.Expr.Rewritters
 {
-    public class ColumnSettingsRewritter : ExpressionRewritter
+    internal class ColumnSettingsRewritter : ExpressionRewritter
     {
         protected override Expression VisitMethodCall(MethodCallExpression mc)
         {

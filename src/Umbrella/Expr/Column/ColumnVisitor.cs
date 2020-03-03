@@ -2,7 +2,7 @@
 
 namespace Umbrella.Expr.Column
 {
-    public class ColumnVisitor : ExpressionVisitor
+    internal class ColumnVisitor : ExpressionVisitor
     {
         public override Expression Visit(Expression node)
         {

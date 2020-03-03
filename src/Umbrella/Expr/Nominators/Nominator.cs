@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Umbrella.Expr.Nominators
 {
-    public abstract class Nominator: ExpressionVisitor
+    internal abstract class Nominator: ExpressionVisitor
     {
         public abstract HashSet<Expression> Nominate(Expression expression);
     }

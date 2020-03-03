@@ -11,7 +11,7 @@ namespace Umbrella.Expr.Rewritters
     /// <summary>
     /// Rewrittes a projector that has as body a ParameterExpression.
     /// </summary>
-    public class ParameterProjectedRewritter : ExpressionRewritter
+    internal class ParameterProjectedRewritter : ExpressionRewritter
     {
         protected override Expression VisitParameter(ParameterExpression p)
         {

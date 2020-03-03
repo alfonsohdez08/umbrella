@@ -5,12 +5,12 @@ using System.Linq.Expressions;
 
 namespace Umbrella.Expr.Column
 {
-    public enum DataTableExpression
+    internal enum DataTableExpression
     {
         Column = 1000
     }
 
-    public class ColumnExpression : Expression
+    internal class ColumnExpression : Expression
     {
         private readonly Type _type;
         public Expression ColumnDefinition { get; private set; }

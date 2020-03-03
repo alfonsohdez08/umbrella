@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Umbrella.Expr.Projector
 {
-    public class NestedProjectionValidator: ExpressionVisitor
+    internal class NestedProjectionValidator: ExpressionVisitor
     {
         private NewExpression _newExpInScope = null;
 
