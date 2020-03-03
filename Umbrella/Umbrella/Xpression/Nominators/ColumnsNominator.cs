@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using Umbrella.Extensions;
 
-namespace Umbrella
+namespace Umbrella.Xpression.Nominators
 {
     public class ColumnsNominator : Nominator
     {

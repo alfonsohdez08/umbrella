@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using Umbrella.Extensions;
 
-namespace Umbrella.Rewritters
+namespace Umbrella.Xpression.Rewritters
 {
     /// <summary>
     /// Rewrittes a projector that has as body a ParameterExpression.

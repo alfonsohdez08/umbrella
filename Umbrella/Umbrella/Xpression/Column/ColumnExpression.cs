@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Text;
+using System.Linq.Expressions;
 
-namespace Umbrella.Expressions
+namespace Umbrella.Xpression.Column
 {
     public enum DataTableExpression
     {
@@ -17,7 +17,7 @@ namespace Umbrella.Expressions
         public override Type Type => _type;
         public override ExpressionType NodeType => (ExpressionType)DataTableExpression.Column;
 
-        public ColumnExpression(Expression columnDefinition)
+        public ColumnExpression(System.Linq.Expressions.Expression columnDefinition)
         {
             _type = columnDefinition.Type;
 

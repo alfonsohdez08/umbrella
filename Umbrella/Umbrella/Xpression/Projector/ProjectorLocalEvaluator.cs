@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Extensions;
 
-namespace Umbrella
+namespace Umbrella.Xpression.Projector
 {
     public class ProjectorLocalEvaluator: ExpressionVisitor
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq.Expressions;
 
-namespace Umbrella
+namespace Umbrella.Xpression.Nominators
 {
     public class ProjectorLocalEvalNominator : Nominator
     {

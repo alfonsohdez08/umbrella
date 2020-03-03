@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Umbrella.Expressions;
 
 namespace Umbrella
 {
