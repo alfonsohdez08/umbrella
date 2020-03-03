@@ -8,7 +8,9 @@ using System.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Umbrella.Extensions;
-using Umbrella.Rewritters;
+using Umbrella.Xpression.Rewritters;
+using Umbrella.Xpression.Projector;
+using Umbrella.Xpression.Column;
 
 namespace Umbrella
 {
@@ -48,27 +50,18 @@ namespace Umbrella
             var parameterProjectedRewritter = new ParameterProjectedRewritter();
             projectorBody = parameterProjectedRewritter.Rewrite(projectorBody);
 
-            /*
-                A projection should be flat (no nested object instantiation) and the properties data types should be primitive or string, datetime. 
-                
-                Also, it should at least reference the projector's parameter. -> right now this is handeld by the local evaluator (should be handled by someone else?)
-
-                The projection validation should happen once the rewritting and local evaluatihon happened.
-            */
-
-            //Local evaluation
             var localEval = new ProjectorLocalEvaluator();
             projectorBody = localEval.Evaluate(projectorBody, parameterExp);
 
+            var columnSettingsRewritter = new ColumnSettingsRewritter();
+            projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
+
             ProjectorValidator.Validate(projectorBody, parameterExp);
-
-            projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
-
-            LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
 
             var columnExpressionMapper = new ColumnExpressionMapper();
             projectorBody = columnExpressionMapper.Map(projectorBody);
-
+            
+            LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
             var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projectorUpdated);
 
             return umbrellaDataTable.GetDataTable();
@@ -76,7 +69,8 @@ namespace Umbrella
 
         private DataTable GetDataTable()
         {
-            List<Column> columns = ColumnsMapping.GetColumns(_projector);
+            var columnsMapped = new ColumnsMapped(_projector);
+            List<Column> columns = columnsMapped.GetColumns();
 
             var dataTable = new DataTable();
             foreach (Column c in columns)

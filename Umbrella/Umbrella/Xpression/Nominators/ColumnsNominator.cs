@@ -31,17 +31,20 @@ namespace Umbrella.Xpression.Nominators
 
         public override HashSet<Expression> Nominate(Expression expression)
         {
+            HashSet<Expression> nominees = null;
+
             try
             {
                 Visit(expression);
 
-                return _nominees;
+                nominees = _nominees;
             }
             finally
             {
                 _nominees = new HashSet<Expression>();
             }
 
+            return nominees;
         }
     }
 }

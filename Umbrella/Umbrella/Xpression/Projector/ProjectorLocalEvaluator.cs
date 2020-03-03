@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Extensions;
+using Umbrella.Xpression.Nominators;
 
 namespace Umbrella.Xpression.Projector
 {
@@ -18,8 +19,8 @@ namespace Umbrella.Xpression.Projector
             try
             {
                 Expression projectorBodyEvaluated = Visit(body);
-                if (projectorBodyEvaluated.NodeType == ExpressionType.Constant)
-                    throw new InvalidOperationException("The given projector projects a constant, which means the projector parameter was not referenced in the projection.");
+                //if (projectorBodyEvaluated.NodeType == ExpressionType.Constant)
+                //    throw new InvalidOperationException("The given projector projects a constant, which means the projector parameter was not referenced in the projection.");
 
                 return projectorBodyEvaluated;
             }

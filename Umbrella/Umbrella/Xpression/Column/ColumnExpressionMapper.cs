@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using Umbrella.Xpression.Nominators;
 
 namespace Umbrella.Xpression.Column
 {
