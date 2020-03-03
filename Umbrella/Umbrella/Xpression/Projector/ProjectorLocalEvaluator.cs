@@ -16,19 +16,17 @@ namespace Umbrella.Xpression.Projector
             var localEvalNominator = new ProjectorLocalEvalNominator(parameter);
             _nominees = localEvalNominator.Nominate(body);
 
+            Expression newProjectorBody = null;
             try
             {
-                Expression projectorBodyEvaluated = Visit(body);
-                //if (projectorBodyEvaluated.NodeType == ExpressionType.Constant)
-                //    throw new InvalidOperationException("The given projector projects a constant, which means the projector parameter was not referenced in the projection.");
-
-                return projectorBodyEvaluated;
+                newProjectorBody = Visit(body);
             }
             finally
             {
                 _nominees = null;
             }
-            
+
+            return newProjectorBody;
         }
 
         public override Expression Visit(Expression node)

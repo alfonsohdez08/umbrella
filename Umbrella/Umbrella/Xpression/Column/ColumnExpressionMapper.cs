@@ -15,14 +15,17 @@ namespace Umbrella.Xpression.Column
             var columnsNominator = new ColumnsNominator();
             _nominatedColumns =  columnsNominator.Nominate(projectorBody);
 
+            Expression projectorWithColumnsMapped = null;
             try
             {
-                return Visit(projectorBody);
+                projectorWithColumnsMapped = Visit(projectorBody);
             }
             finally
             {
                 _nominatedColumns = null;
             }
+
+            return projectorWithColumnsMapped;
         }
 
         public override Expression Visit(Expression node)

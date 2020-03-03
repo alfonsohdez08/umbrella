@@ -33,5 +33,16 @@ namespace Umbrella.Xpression
 
             return p;
         }
+
+        protected override Expression VisitConstant(ConstantExpression c)
+        {
+            if (c.Type == typeof(ColumnSettings))
+            {
+                var columnSettings = (ColumnSettings)c.Value;
+                Visit(columnSettings.Mapper);
+            }
+
+            return c;
+        }
     }
 }

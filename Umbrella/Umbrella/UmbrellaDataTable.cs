@@ -42,27 +42,25 @@ namespace Umbrella
         {
             LambdaExpression projectorLambdaExp = (LambdaExpression)projector;
 
-            ParameterExpression parameterExp = projectorLambdaExp.Parameters[0];
-            //if (!parameterExp.Type.IsComplexType())
-            //    throw new ArgumentException("The input type for the project is not a complex type.");
-
+            ParameterExpression projectorParameter = projectorLambdaExp.Parameters[0];
             Expression projectorBody = projectorLambdaExp.Body;
+
             var parameterProjectedRewritter = new ParameterProjectedRewritter();
             projectorBody = parameterProjectedRewritter.Rewrite(projectorBody);
 
             var localEval = new ProjectorLocalEvaluator();
-            projectorBody = localEval.Evaluate(projectorBody, parameterExp);
+            projectorBody = localEval.Evaluate(projectorBody, projectorParameter);
 
             var columnSettingsRewritter = new ColumnSettingsRewritter();
             projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
 
-            ProjectorValidator.Validate(projectorBody, parameterExp);
+            ProjectorValidator.Validate(projectorBody, projectorParameter);
 
             var columnExpressionMapper = new ColumnExpressionMapper();
             projectorBody = columnExpressionMapper.Map(projectorBody);
             
-            LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
-            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projectorUpdated);
+            LambdaExpression newProjector = Expression.Lambda(projectorBody, projectorParameter);
+            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, newProjector);
 
             return umbrellaDataTable.GetDataTable();
         }
