@@ -54,7 +54,7 @@ namespace Umbrella.Rewritters
                 return mi;
             }
 
-            throw new InvalidOperationException("The projector's input type is not a complex type.");
+            throw new InvalidOperationException("The projected parameter is not a complex type. Please use the new operator for project the non complex parameter.");
         }
 
         public override Expression Rewrite(Expression expression)

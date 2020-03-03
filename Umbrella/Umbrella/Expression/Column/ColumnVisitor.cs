@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Expressions;
 
-namespace Umbrella.Visitors
+namespace Umbrella
 {
     public class ColumnVisitor : ExpressionVisitor
     {

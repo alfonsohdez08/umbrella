@@ -41,28 +41,33 @@ namespace Umbrella
             LambdaExpression projectorLambdaExp = (LambdaExpression)projector;
 
             ParameterExpression parameterExp = projectorLambdaExp.Parameters[0];
-            if (!parameterExp.Type.IsComplexType())
-                throw new ArgumentException("The input type for the project is not a complex type.");
+            //if (!parameterExp.Type.IsComplexType())
+            //    throw new ArgumentException("The input type for the project is not a complex type.");
 
             Expression projectorBody = projectorLambdaExp.Body;
             var parameterProjectedRewritter = new ParameterProjectedRewritter();
             projectorBody = parameterProjectedRewritter.Rewrite(projectorBody);
 
             /*
-                A projection should be flat (no nested object instantiation) and the properties data types should be primitive or string, datetime.
+                A projection should be flat (no nested object instantiation) and the properties data types should be primitive or string, datetime. 
                 
-                The projection validation should happen once the rewritting and local evaluation happened.
+                Also, it should at least reference the projector's parameter. -> right now this is handeld by the local evaluator (should be handled by someone else?)
+
+                The projection validation should happen once the rewritting and local evaluatihon happened.
             */
 
-
             //Local evaluation
-            projectorBody = LocalEvaluator.Evaluate(projectorBody, parameterExp);
+            var localEval = new ProjectorLocalEvaluator();
+            projectorBody = localEval.Evaluate(projectorBody, parameterExp);
 
             ProjectorValidator.Validate(projectorBody, parameterExp);
 
             projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
 
             LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
+
+            var columnExpressionMapper = new ColumnExpressionMapper();
+            projectorBody = columnExpressionMapper.Map(projectorBody);
 
             var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projectorUpdated);
 
