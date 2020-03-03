@@ -18,11 +18,14 @@ namespace Umbrella.Expr.Nominators
             _isPartOfColumn = true;
 
             base.Visit(node);
-            
-            if (node.NodeType == ExpressionType.New)
-                _isPartOfColumn = false;
-            else
-                _nominees.Add(node);
+
+            if (_isPartOfColumn)
+            {
+                if (node.NodeType == ExpressionType.New)
+                    _isPartOfColumn = false;
+                else
+                    _nominees.Add(node);
+            }
 
             _isPartOfColumn &= saveIsPartOfColumn;
 

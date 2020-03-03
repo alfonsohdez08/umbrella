@@ -44,11 +44,13 @@ namespace Umbrella.Expr.Nominators
 
             base.Visit(node);
 
-            if (node is ParameterExpression parameter && parameter == _parameter)
-                _isEvaluableLocally = false;
-
             if (_isEvaluableLocally)
-                _nominees.Add(node);
+            {
+                if (node is ParameterExpression parameter && parameter == _parameter)
+                    _isEvaluableLocally = false;
+                else
+                    _nominees.Add(node);
+            }
 
             _isEvaluableLocally &= saveIsEvaluableLocally;
 

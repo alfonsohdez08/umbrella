@@ -82,11 +82,8 @@ namespace Umbrella
             }
 
             Expression columnDefinition = c.ColumnDefinition;
-            var constantExp = columnDefinition as ConstantExpression;
-            if (constantExp != null && constantExp.Type == typeof(ColumnSettings))
+            if (columnDefinition is ConstantExpression constantExp && constantExp.Value is ColumnSettings columnSettings)
             {
-                var columnSettings = (ColumnSettings)constantExp.Value;
-
                 columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
                 columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
                 columnDataType = columnSettings.ColumnDataType;
