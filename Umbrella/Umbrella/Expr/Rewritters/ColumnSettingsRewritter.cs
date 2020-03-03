@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Extensions;
 
-namespace Umbrella.Xpression.Rewritters
+namespace Umbrella.Expr.Rewritters
 {
     public class ColumnSettingsRewritter : ExpressionRewritter
     {

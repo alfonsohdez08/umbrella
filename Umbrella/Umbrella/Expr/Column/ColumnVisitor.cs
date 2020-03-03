@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Umbrella.Xpression.Column
+namespace Umbrella.Expr.Column
 {
     public class ColumnVisitor : ExpressionVisitor
     {

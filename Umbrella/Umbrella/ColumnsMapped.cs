@@ -4,8 +4,8 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Umbrella.Xpression;
-using Umbrella.Xpression.Column;
+using Umbrella.Expr;
+using Umbrella.Expr.Column;
 
 namespace Umbrella
 {

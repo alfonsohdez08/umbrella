@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq.Expressions;
 
-namespace Umbrella.Xpression.Projector
+namespace Umbrella.Expr.Projector
 {
     public class NestedProjectionValidator: ExpressionVisitor
     {

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Umbrella.Xpression
+namespace Umbrella.Expr
 {
     public class ParameterReferencesFinder: ExpressionVisitor
     {

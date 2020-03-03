@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq.Expressions;
 
-namespace Umbrella.Xpression.Column
+namespace Umbrella.Expr.Column
 {
     public enum DataTableExpression
     {

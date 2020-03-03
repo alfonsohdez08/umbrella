@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
-using Umbrella.Xpression.Nominators;
+using Umbrella.Expr.Nominators;
 
-namespace Umbrella.Xpression.Column
+namespace Umbrella.Expr.Column
 {
     public class ColumnExpressionMapper: ExpressionVisitor
     {

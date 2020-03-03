@@ -8,9 +8,9 @@ using System.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Umbrella.Extensions;
-using Umbrella.Xpression.Rewritters;
-using Umbrella.Xpression.Projector;
-using Umbrella.Xpression.Column;
+using Umbrella.Expr.Rewritters;
+using Umbrella.Expr.Projector;
+using Umbrella.Expr.Column;
 
 namespace Umbrella
 {

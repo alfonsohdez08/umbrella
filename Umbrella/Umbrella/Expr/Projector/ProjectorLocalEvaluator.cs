@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Extensions;
-using Umbrella.Xpression.Nominators;
+using Umbrella.Expr.Nominators;
 
-namespace Umbrella.Xpression.Projector
+namespace Umbrella.Expr.Projector
 {
     public class ProjectorLocalEvaluator: ExpressionVisitor
     {
