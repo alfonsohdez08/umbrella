@@ -8,7 +8,9 @@ using System.Text;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Umbrella.Extensions;
-using Umbrella.Rewritters;
+using Umbrella.Expr.Rewritters;
+using Umbrella.Expr.Projector;
+using Umbrella.Expr.Column;
 
 namespace Umbrella
 {
@@ -40,30 +42,33 @@ namespace Umbrella
         {
             LambdaExpression projectorLambdaExp = (LambdaExpression)projector;
 
-            ParameterExpression parameterExp = projectorLambdaExp.Parameters[0];
-            if (!parameterExp.Type.IsComplexType())
-                throw new ArgumentException("The input type for the project is not a complex type.");
-
+            ParameterExpression projectorParameter = projectorLambdaExp.Parameters[0];
             Expression projectorBody = projectorLambdaExp.Body;
-            projectorBody = ProjectorParameterRewritter.Rewrite(projectorBody);
 
-            //Local evaluation
-            projectorBody = LocalEvaluator.Evaluate(projectorBody, parameterExp);
+            var parameterProjectedRewritter = new ParameterProjectedRewritter();
+            projectorBody = parameterProjectedRewritter.Rewrite(projectorBody);
 
-            ProjectorValidator.Validate(projectorBody, parameterExp);
+            var localEval = new ProjectorLocalEvaluator();
+            projectorBody = localEval.Evaluate(projectorBody, projectorParameter);
 
-            projectorBody = ColumnSettingsRewritter.Rewrite(projectorBody);
+            var columnSettingsRewritter = new ColumnSettingsRewritter();
+            projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
 
-            LambdaExpression projectorUpdated = Expression.Lambda(projectorBody, parameterExp);
+            ProjectorValidator.Validate(projectorBody, projectorParameter);
 
-            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, projectorUpdated);
+            var columnExpressionMapper = new ColumnExpressionMapper();
+            projectorBody = columnExpressionMapper.Map(projectorBody);
+            
+            LambdaExpression newProjector = Expression.Lambda(projectorBody, projectorParameter);
+            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, newProjector);
 
             return umbrellaDataTable.GetDataTable();
         }
 
         private DataTable GetDataTable()
         {
-            List<Column> columns = ColumnsMapping.GetColumns(_projector);
+            var columnsMapped = new ColumnsMapped(_projector);
+            List<Column> columns = columnsMapped.GetColumns();
 
             var dataTable = new DataTable();
             foreach (Column c in columns)

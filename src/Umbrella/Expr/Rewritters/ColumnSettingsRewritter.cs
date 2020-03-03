@@ -4,30 +4,10 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Extensions;
 
-namespace Umbrella.Rewritters
+namespace Umbrella.Expr.Rewritters
 {
-    public class ColumnSettingsRewritter: ExpressionVisitor
+    public class ColumnSettingsRewritter : ExpressionRewritter
     {
-        private readonly Expression _projectorBody;
-
-        public ColumnSettingsRewritter(Expression projectorBody)
-        {
-            _projectorBody = projectorBody;
-        }
-
-        public static Expression Rewrite(Expression projectorBody)
-        {
-            var columnSettingsRewritter = new ColumnSettingsRewritter(projectorBody);
-            Expression projectorBodyUpdated = columnSettingsRewritter.Rewrite();
-
-            return projectorBodyUpdated;
-        }
-
-        public Expression Rewrite()
-        {
-            return Visit(_projectorBody);
-        }
-
         protected override Expression VisitMethodCall(MethodCallExpression mc)
         {
             if (mc.Type == typeof(ColumnSettings) && mc.Method.Name == "Build")
@@ -41,7 +21,8 @@ namespace Umbrella.Rewritters
                 var columnSettings = typeof(ColumnSettings).GetMethod("Build").MakeGenericMethod(mapperLambdaExp.Body.Type).Invoke(null, new object[] { mapperLambdaExp });
 
                 return Expression.Constant(columnSettings, typeof(ColumnSettings));
-            }else if (mc.Type == typeof(ColumnSettings))
+            }
+            else if (mc.Type == typeof(ColumnSettings))
             {
                 Expression e = base.VisitMethodCall(mc);
                 LambdaExpression le = Expression.Lambda(e);
@@ -54,5 +35,9 @@ namespace Umbrella.Rewritters
             return base.VisitMethodCall(mc);
         }
 
+        public override Expression Rewrite(Expression expression)
+        {
+            return Visit(expression);
+        }
     }
 }

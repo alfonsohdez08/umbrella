@@ -4,39 +4,34 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
-using Umbrella.Expressions;
-using Umbrella.Visitors;
+using Umbrella.Expr;
+using Umbrella.Expr.Column;
+using Umbrella.Extensions;
 
 namespace Umbrella
 {
-    public class ColumnsMapped : ColumnVisitor
+    public class ColumnsMapped: ColumnVisitor
     {
-        public List<Column> Columns { get; private set; } = new List<Column>();
+        private readonly List<Column> _columns = new List<Column>();
+        private readonly ParameterExpression _parameter;
+        private readonly Expression _projectorBody;
+        private readonly ParameterReferencesFinder _parameterFinder = new ParameterReferencesFinder();
 
         private MemberInfo _memberInScope;
-
-        private readonly ParameterExpression _parameterExp;
-        private readonly Expression _projectorBody;
 
         public ColumnsMapped(Expression projector)
         {
             var lambdaExp = (LambdaExpression)projector;
 
-            _parameterExp = lambdaExp.Parameters[0];
+            _parameter = lambdaExp.Parameters[0];
             _projectorBody = lambdaExp.Body;
         }
 
-        public static List<Column> GetMappedColumns(Expression projector)
-        {
-            var columnsMappedVisitor = new ColumnsMapped(projector);
-            columnsMappedVisitor.SetColumns();
-
-            return columnsMappedVisitor.Columns;
-        }
-
-        public void SetColumns()
+        public List<Column> GetColumns()
         {
             Visit(_projectorBody);
+
+            return _columns;
         }
 
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment ma)
@@ -88,23 +83,23 @@ namespace Umbrella
             }
 
             Expression columnDefinition = c.ColumnDefinition;
-            var constantExp = columnDefinition as ConstantExpression;
-            if (constantExp != null && constantExp.Type == typeof(ColumnSettings))
+            if (columnDefinition is ConstantExpression constantExp && constantExp.Value is ColumnSettings columnSettings)
             {
-                var columnSettings = (ColumnSettings)constantExp.Value;
-
                 columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
                 columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
                 columnDataType = columnSettings.ColumnDataType;
             }
 
+            if (!columnDataType.IsBuiltInType())
+                throw new InvalidOperationException("The column data type is not valid.");
+
             LambdaExpression le = null;
-            bool isParameterless = MapperParameterVisitor.IsMapperFunctionParameterless(_parameterExp, columnDefinition);
+            bool isParameterless = !_parameterFinder.Find(columnDefinition, _parameter);
 
             if (isParameterless)
                 le = Expression.Lambda(columnDefinition);
             else
-                le = Expression.Lambda(columnDefinition, _parameterExp);
+                le = Expression.Lambda(columnDefinition, _parameter);
 
             var column = new Column()
             {
@@ -115,44 +110,9 @@ namespace Umbrella
                 IsParameterless = isParameterless
             };
 
-            Columns.Add(column);
+            _columns.Add(column);
 
             return c;
-        }
-    }
-
-    public class MapperParameterVisitor: ExpressionVisitor
-    {
-        private readonly ParameterExpression _parameterExp;
-        private readonly Expression _mappingExpression;
-
-        private bool _foundParameter = false;
-
-        public MapperParameterVisitor(ParameterExpression parameterExp, Expression mappingExpression)
-        {
-            _parameterExp = parameterExp;
-            _mappingExpression = mappingExpression;
-        }
-
-        public void FindParameter()
-        {
-            Visit(_mappingExpression);
-        }
-
-        public static bool IsMapperFunctionParameterless(ParameterExpression parameter, Expression mappingExpression)
-        {
-            var mapperParameterVisitor = new MapperParameterVisitor(parameter, mappingExpression);
-            mapperParameterVisitor.FindParameter();
-
-            return !mapperParameterVisitor._foundParameter;
-        }
-
-        protected override Expression VisitParameter(ParameterExpression p)
-        {
-            if (_parameterExp == p)
-                _foundParameter = true;
-
-            return p;
         }
     }
 }

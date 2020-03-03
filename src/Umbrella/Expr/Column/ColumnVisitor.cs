@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
-using Umbrella.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace Umbrella.Visitors
+namespace Umbrella.Expr.Column
 {
     public class ColumnVisitor : ExpressionVisitor
     {
