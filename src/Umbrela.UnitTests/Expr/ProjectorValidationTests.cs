@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Expr.Projector;
+using Umbrella.Tests.Mocks;
 
 namespace Umbrella.Tests.Expr
 {

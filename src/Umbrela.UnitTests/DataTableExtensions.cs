@@ -6,7 +6,7 @@ namespace Umbrella.Tests
 {
     public static class DataTableExtensions
     {
-        public static bool HasColumns(this DataTable dataTable, params string[] columns)
+        public static bool HasColumns(this System.Data.DataTable dataTable, params string[] columns)
         {
             for (int index = 0; index < columns.Length; index++)
             {
@@ -26,6 +26,11 @@ namespace Umbrella.Tests
             columnCollection.CopyTo(columns, 0);
 
             return columns.ToList();
+        }
+
+        internal static bool HasAllColumns(this List<Column> columns, params string[] columnNames)
+        {
+            return columns.TrueForAll(c => columnNames.Contains(c.Name));
         }
     }
 }

@@ -2,10 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using Umbrella.Expr.Column;
-using Umbrella.Tests.Expr.UnitTests.Helpers;
-using Umbrella.UnitTests;
+using Umbrella.Tests.Helpers;
+using Umbrella.Tests.Mocks;
 
 namespace Umbrella.Tests.Expr
 {
@@ -115,19 +114,19 @@ namespace Umbrella.Tests.Expr
             Assert.IsTrue(columnExpressions.Count == 0);
         }
 
-        [TestMethod]
-        public void Map_PassAMemberAcessAsProjection_ShouldMapToColumnExpression()
-        {
-            Expression<Func<Person, dynamic>> projector = p => p.Id;
+        //[TestMethod]
+        //public void Map_PassAMemberAcessAsProjection_ShouldMapToColumnExpression()
+        //{
+        //    Expression<Func<Person, dynamic>> projector = p => p.Id;
 
-            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+        //    Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
 
-            var memberExpression = (MemberExpression)projector.Body;
-            var columnExpression = new ColumnExpression(memberExpression);
+        //    var memberExpression = (MemberExpression)projector.Body;
+        //    var columnExpression = new ColumnExpression(memberExpression);
 
-            List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
+        //    List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
 
-            Assert.IsTrue(columnExpression.ColumnDefinition == columnExpressions[0].ColumnDefinition);
-        }
+        //    Assert.IsTrue(columnExpression.ColumnDefinition == columnExpressions[0].ColumnDefinition);
+        //}
     }
 }

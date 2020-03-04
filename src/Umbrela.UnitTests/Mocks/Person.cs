@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Umbrella.Tests
+namespace Umbrella.Tests.Mocks
 {
     public class Person
     {
