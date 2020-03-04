@@ -7,6 +7,7 @@ using System.Text;
 using System.Linq;
 using static Umbrella.UnitTests.RowsMappingHelper;
 using Newtonsoft.Json;
+using Umbrella.Tests;
 
 namespace Umbrella.UnitTests
 {

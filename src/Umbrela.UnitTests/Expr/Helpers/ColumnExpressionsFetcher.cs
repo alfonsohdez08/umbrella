@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using Umbrella.Expr.Column;
 
-namespace Umbrella.Expr.UnitTests.Helpers
+namespace Umbrella.Tests.Expr.UnitTests.Helpers
 {
     internal class ColumnExpressionsFetcher: ExpressionVisitor
     {

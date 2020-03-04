@@ -54,7 +54,7 @@ namespace Umbrella
             var columnSettingsRewritter = new ColumnSettingsRewritter();
             projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
 
-            ProjectorValidator.Validate(projectorBody, projectorParameter);
+            ProjectorValidator.Validate(Expression.Lambda(projectorBody, projectorParameter));
 
             var columnExpressionMapper = new ColumnExpressionMapper();
             projectorBody = columnExpressionMapper.Map(projectorBody);

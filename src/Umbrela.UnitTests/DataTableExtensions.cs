@@ -2,7 +2,7 @@
 using System.Data;
 using System.Linq;
 
-namespace Umbrella.UnitTests
+namespace Umbrella.Tests
 {
     public static class DataTableExtensions
     {

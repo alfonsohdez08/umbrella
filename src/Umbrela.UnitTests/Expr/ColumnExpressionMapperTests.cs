@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Expr.Column;
-using Umbrella.Expr.UnitTests.Helpers;
+using Umbrella.Tests.Expr.UnitTests.Helpers;
 using Umbrella.UnitTests;
 
-namespace Umbrella.Expr.UnitTests
+namespace Umbrella.Tests.Expr
 {
     [TestClass]
     public class ColumnExpressionMapperTests

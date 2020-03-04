@@ -7,6 +7,11 @@ namespace Umbrella.Expr.Projector
     {
         private NewExpression _newExpInScope = null;
 
+        public void Validate(Expression expression)
+        {
+            Visit(expression);
+        }
+
         protected override Expression VisitNew(NewExpression ne)
         {
             if (_newExpInScope == null)

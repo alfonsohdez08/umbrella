@@ -8,20 +8,20 @@ namespace Umbrella.Expr.Projector
     internal static class ProjectorValidator
     {
         /// <summary>
-        /// Checks if the projector's is a flat projector and the columns projected are primitives.
+        /// Checks if the projector's is a flat one and the columns projected are primitives.
         /// </summary>
-        /// <param name="projectorBody">Projector's content (body).</param>
-        public static void Validate(Expression projectorBody, ParameterExpression projectorParameter)
+        /// <param name="projector">Projector.</param>
+        public static void Validate(LambdaExpression projector)
         {
             var parameterReferencesFinder = new ParameterReferencesFinder();
-            if (!parameterReferencesFinder.Find(projectorBody, projectorParameter))
+            if (!parameterReferencesFinder.Find(projector.Body, projector.Parameters[0]))
                 throw new InvalidOperationException("The projector's parameter is not being referenced in the projector's body.");
 
-            if (!(projectorBody.NodeType == ExpressionType.New || projectorBody.NodeType == ExpressionType.MemberInit))
+            if (!(projector.Body.NodeType == ExpressionType.New || projector.Body.NodeType == ExpressionType.MemberInit))
                 throw new ArgumentException("The given projector should denote an object instantiation.");
 
             var nestedProjectionValidator = new NestedProjectionValidator();
-            nestedProjectionValidator.Visit(projectorBody);
+            nestedProjectionValidator.Validate(projector.Body);
         }
     }
 }

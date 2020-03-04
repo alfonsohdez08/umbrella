@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 
-namespace Umbrella.UnitTests
+namespace Umbrella.Tests
 {
     public static class ExpressionExtensions
     {
