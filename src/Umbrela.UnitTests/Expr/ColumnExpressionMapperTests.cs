@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Expr.Column;
+using Umbrella.Expr.UnitTests.Helpers;
 using Umbrella.UnitTests;
 
 namespace Umbrella.Expr.UnitTests
@@ -97,6 +98,36 @@ namespace Umbrella.Expr.UnitTests
             {
                 Assert.IsTrue(bindingExpressions[index] == columnExpressions[index].ColumnDefinition, $"Dismatch between expressions mapped. Expected: {bindingExpressions[index]} ; Mapped: {columnExpressions[index].ColumnDefinition}");
             }
+        }
+
+        [TestMethod]
+        public void Map_AnEmptyProjection_ShouldNotMapAnythingBecauseItsNotProjectingProperties()
+        {
+            // Arrange
+            Expression<Func<Person, dynamic>> projector = p => new { };
+
+            // Act
+            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+
+            // Assert
+            List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
+
+            Assert.IsTrue(columnExpressions.Count == 0);
+        }
+
+        [TestMethod]
+        public void Map_PassAMemberAcessAsProjection_ShouldMapToColumnExpression()
+        {
+            Expression<Func<Person, dynamic>> projector = p => p.Id;
+
+            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+
+            var memberExpression = (MemberExpression)projector.Body;
+            var columnExpression = new ColumnExpression(memberExpression);
+
+            List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
+
+            Assert.IsTrue(columnExpression.ColumnDefinition == columnExpressions[0].ColumnDefinition);
         }
     }
 }
