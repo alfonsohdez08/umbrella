@@ -12,9 +12,9 @@ namespace Umbrella
         private string _columnName;
         private Type _columnDataType;
 
-        public Expression Mapper => _mapper;
-        public string ColumnName => _columnName;
-        public Type ColumnDataType => _columnDataType;
+        internal Expression Mapper => _mapper;
+        internal string ColumnName => _columnName;
+        internal Type ColumnDataType => _columnDataType;
 
         private ColumnSettings(Expression mapper, Type columnDataType)
         {

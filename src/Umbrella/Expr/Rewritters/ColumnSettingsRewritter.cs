@@ -15,9 +15,6 @@ namespace Umbrella.Expr.Rewritters
                 var expQuoted = (UnaryExpression)mc.Arguments[0];
                 var mapperLambdaExp = (LambdaExpression)expQuoted.Operand;
 
-                // why this throws an exception? (research this)
-                //var x = Expression.Call(null, mc.Method, new Expression[] {mapperLambdaExp});
-
                 var columnSettings = typeof(ColumnSettings).GetMethod("Build").MakeGenericMethod(mapperLambdaExp.Body.Type).Invoke(null, new object[] { mapperLambdaExp });
 
                 return Expression.Constant(columnSettings, typeof(ColumnSettings));

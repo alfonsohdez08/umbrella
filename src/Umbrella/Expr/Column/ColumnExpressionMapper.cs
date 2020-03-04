@@ -10,6 +10,11 @@ namespace Umbrella.Expr.Column
     {
         private HashSet<Expression> _nominatedColumns = new HashSet<Expression>();
 
+        /// <summary>
+        /// Maps property's binding expression to a column expression.
+        /// </summary>
+        /// <param name="projectorBody">A flat projector (meaning, no nested projections).</param>
+        /// <returns>A projector where each property's binding expression has been replaced by a column expression.</returns>
         public Expression Map(Expression projectorBody)
         {
             var columnsNominator = new ColumnsNominator();
