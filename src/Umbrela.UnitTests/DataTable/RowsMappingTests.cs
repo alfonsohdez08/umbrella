@@ -67,7 +67,7 @@ namespace Umbrella.Tests.Datatable
         public void ToDataTable_PassAnInstanceMethodInTheProjector_ShouldRunLocallyTheMethodAndTreatItsResultAsAConstant()
         {
             var place = new Place();
-            Expression<Func<Person, dynamic>> projector = p => new { BornPlace = place.GetPlace(false), p.IsAlive};
+            Expression<Func<Person, dynamic>> projector = p => new { BornPlace = ColumnSettings.Build(() => place.GetPlace(false)).Name("Born Place"), p.IsAlive};
 
             DataTable dataTable = _people.ToDataTable(projector);
 

@@ -11,12 +11,12 @@ namespace Umbrella.Tests.Expr
     [TestClass]
     public class ProjectorLocalEvaluatorTests
     {
-        private ProjectorLocalEvaluator _localEvaluator;
+        private LocalEvaluator _localEvaluator;
 
         [TestInitialize]
         public void Init()
         {
-            _localEvaluator = new ProjectorLocalEvaluator();
+            _localEvaluator = new LocalEvaluator();
         }
 
         [TestMethod]

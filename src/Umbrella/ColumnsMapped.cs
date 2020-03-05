@@ -6,6 +6,9 @@ using System.Reflection;
 using System.Text;
 using Umbrella.Expr;
 using Umbrella.Expr.Column;
+using Umbrella.Expr.Evaluators;
+using Umbrella.Expr.Projector;
+using Umbrella.Expr.Rewritters;
 using Umbrella.Extensions;
 
 namespace Umbrella
@@ -19,12 +22,35 @@ namespace Umbrella
 
         private MemberInfo _memberInScope;
 
-        public ColumnsMapped(Expression projector)
+        public ColumnsMapped(LambdaExpression projector)
         {
-            var lambdaExp = (LambdaExpression)projector;
+            projector = ShapeProjector(projector);
 
-            _parameter = lambdaExp.Parameters[0];
-            _projectorBody = lambdaExp.Body;
+            _parameter = projector.Parameters[0];
+            _projectorBody = projector.Body;
+        }
+
+        private LambdaExpression ShapeProjector(LambdaExpression projector)
+        {
+            var parameterProjectedRewritter = new ParameterProjectedRewritter();
+            Expression body = null;
+
+            body = parameterProjectedRewritter.Rewrite(projector.Body);
+            projector.UpdateBody(body);
+
+            var localEval = new LocalEvaluator();
+            projector = (LambdaExpression)localEval.Evaluate(projector);
+
+            var columnSettingsRewritter = new ColumnSettingsEvaluator();
+            projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
+
+            var projectionValidator = new ProjectionValidator();
+            projectionValidator.Validate(projector);
+
+            var columnExpressionMapper = new ColumnExpressionMapper();
+            projectorBody = columnExpressionMapper.Map(projectorBody);
+
+            return Expression.Lambda(projectorBody, projectorParameter);
         }
 
         public List<Column> GetColumns()
@@ -65,15 +91,15 @@ namespace Umbrella
 
                 _memberInScope = null;
             }
-            else
-            {
-                var m = c.ColumnDefinition as MemberExpression;
-                if (m == null)
-                    throw new NotSupportedException($"Can not understand this projector's part: {c.ColumnDefinition.ToString()}");
+            //else
+            //{
+            //    var m = c.ColumnDefinition as MemberExpression;
+            //    if (m == null)
+            //        throw new NotSupportedException($"Can not understand this projector's part: {c.ColumnDefinition.ToString()}");
 
-                columnName = m.Member.Name;
-                columnDataType = ((PropertyInfo)m.Member).PropertyType;
-            }
+            //    columnName = m.Member.Name;
+            //    columnDataType = ((PropertyInfo)m.Member).PropertyType;
+            //}
 
             Type nullableType = Nullable.GetUnderlyingType(columnDataType);
             if (nullableType != null)

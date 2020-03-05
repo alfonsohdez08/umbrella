@@ -57,13 +57,12 @@ namespace Umbrella.Expr.Rewritters
             throw new InvalidOperationException("The projected parameter is not a complex type. Please use the new operator for project the non complex parameter.");
         }
 
-        public override Expression Rewrite(Expression projectorBody)
+        public override Expression Rewrite(Expression projection)
         {
-            bool isParameterProjected = projectorBody is ParameterExpression;
-            if (isParameterProjected)
-                return Visit(projectorBody);
+            if (projection is ParameterExpression)
+                return Visit(projection);
 
-            return projectorBody;
+            return projection;
         }
     }
 }

@@ -5,28 +5,28 @@ using System.Text;
 using Umbrella.Extensions;
 using Umbrella.Expr.Nominators;
 
-namespace Umbrella.Expr.Projector
+namespace Umbrella.Expr.Evaluators
 {
-    internal class ProjectorLocalEvaluator: ExpressionVisitor
+    internal class LocalEvaluator: Evaluator
     {
         private HashSet<Expression> _nominees;
 
-        public Expression Evaluate(Expression body, ParameterExpression parameter)
+        public override Expression Evaluate(LambdaExpression expression)
         {
-            var localEvalNominator = new ProjectorLocalEvalNominator(parameter);
-            _nominees = localEvalNominator.Nominate(body);
+            var localEvalNominator = new LocalEvalNominator();
+            _nominees = localEvalNominator.Nominate(expression);
 
-            Expression newProjectorBody = null;
+            Expression body = null;
             try
             {
-                newProjectorBody = Visit(body);
+                body = Visit(expression.Body);
             }
             finally
             {
                 _nominees = null;
             }
 
-            return newProjectorBody;
+            return Expression.Lambda(body, expression.Parameters);
         }
 
         public override Expression Visit(Expression node)

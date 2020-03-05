@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Extensions;
 
-namespace Umbrella.Expr.Rewritters
+namespace Umbrella.Expr.Evaluators
 {
-    internal class ColumnSettingsRewritter : ExpressionRewritter
+    internal class ColumnSettingsEvaluator: Evaluator
     {
         protected override Expression VisitMethodCall(MethodCallExpression mc)
         {
@@ -32,9 +32,11 @@ namespace Umbrella.Expr.Rewritters
             return base.VisitMethodCall(mc);
         }
 
-        public override Expression Rewrite(Expression expression)
+        public override Expression Evaluate(LambdaExpression expression)
         {
-            return Visit(expression);
+            Expression body = Visit(expression.Body);
+
+            return LambdaExpression
         }
     }
 }
