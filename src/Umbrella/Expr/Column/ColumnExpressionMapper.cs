@@ -13,11 +13,10 @@ namespace Umbrella.Expr.Column
         /// <summary>
         /// Maps property's binding expression to a column expression.
         /// </summary>
-        /// <param name="expression">Projector.</param>
+        /// <param name="lambda">Projector.</param>
         /// <returns>A projector where each property's binding expression has been replaced by a column expression.</returns>
-        public Expression Map(Expression expression)
+        public Expression Map(LambdaExpression lambda)
         {
-            var lambda = (LambdaExpression)expression;
             Expression projectionMapped = null;
 
             try

@@ -14,7 +14,7 @@ using Umbrella.Extensions;
 
 namespace Umbrella
 {
-    internal class ColumnsMapped: ColumnVisitor
+    internal class ColumnsMapping: ColumnVisitor
     {
         private List<Column> _columns = new List<Column>();
         private readonly ParameterExpression _projectorParameter;
@@ -23,7 +23,7 @@ namespace Umbrella
 
         private MemberInfo _memberInScope;
 
-        public ColumnsMapped(LambdaExpression projector)
+        public ColumnsMapping(LambdaExpression projector)
         {
             projector = ShapeProjector(projector);
 

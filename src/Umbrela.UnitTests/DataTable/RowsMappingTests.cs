@@ -72,7 +72,7 @@ namespace Umbrella.Tests.Datatable
             DataTable dataTable = _people.ToDataTable(projector);
 
             Assert.IsTrue(
-                ValidateRowsAreMapped(_people.Select(p => new { BornPlace = place.GetPlace(false)}), dataTable, (p, r) => p.BornPlace == (string)r["BornPlace"])
+                ValidateRowsAreMapped(_people.Select(p => new { BornPlace = place.GetPlace(false)}), dataTable, (p, r) => p.BornPlace == (string)r["Born Place"])
                 );
         }
 

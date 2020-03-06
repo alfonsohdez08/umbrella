@@ -12,7 +12,7 @@ namespace Umbrella.Tests.Datatable
     [TestClass]
     public class ColumnsMappingTests
     {
-        private ColumnsMapped _columnsMapped;
+        private ColumnsMapping _columnsMapped;
 
         [TestInitialize]
         public void Init()
@@ -25,7 +25,7 @@ namespace Umbrella.Tests.Datatable
         {
             Expression<Func<Person, dynamic>> projector = p => new { ID = p.Id, p.FirstName, p.LastName, DOB = p.DateOfBirth };
 
-            List<Column> columns = new ColumnsMapped(projector).GetColumns();
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
             Assert.IsTrue(columns.HasAllColumns("ID", "FirstName", "LastName", "DOB"));
         }
@@ -35,7 +35,7 @@ namespace Umbrella.Tests.Datatable
         {
             Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id, IsAlive = p.IsAlive };
 
-            List<Column> columns = new ColumnsMapped(projector).GetColumns();
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
             columns.HasAllColumns("Id", "IsAlive");
         }
@@ -45,7 +45,7 @@ namespace Umbrella.Tests.Datatable
         {
             Expression<Func<Person, dynamic>> projector = p => p;
 
-            List<Column> columns = new ColumnsMapped(projector).GetColumns();
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
             Assert.IsTrue(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
         }

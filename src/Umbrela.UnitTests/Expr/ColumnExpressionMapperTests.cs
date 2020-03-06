@@ -26,15 +26,13 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { p.Id };
 
             // Act
-            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+            Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
             // Assert
             var memberExpression = (MemberExpression)((NewExpression)projector.Body).GetExpressionByMember("Id");
-            var columnExpression = new ColumnExpression(memberExpression);
+            ColumnExpression columnExpressionMapped = new ColumnExpressionsFetcher().FetchAll(projectorMapped)[0];
 
-            var columnExpressionMapped = (ColumnExpression)((NewExpression)projectorMapped).Arguments[0];
-
-            Assert.IsTrue(columnExpression.ColumnDefinition == columnExpressionMapped.ColumnDefinition);
+            Assert.IsTrue(columnExpressionMapped.ColumnDefinition == memberExpression);
         }
 
         [TestMethod]
@@ -44,7 +42,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { p.Id, p.FirstName, p.LastName };
 
             // Act
-            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+            Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
             // Asserts 
             Expression[] newExpArgs = ((NewExpression)projector.Body).GetArguments();
@@ -66,7 +64,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id };
 
             // Act
-            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+            Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
             // Assert
             var m = (MemberExpression)((MemberInitExpression)projector.Body).GetExpressionByMember("Id");
@@ -84,7 +82,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new Person() {Id = p.Id, FirstName = p.LastName };
 
             // Act
-            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+            Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
             // Asserts 
             Expression[] bindingExpressions = ((MemberInitExpression)projector.Body).GetBindingExpressions();
@@ -106,7 +104,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { };
 
             // Act
-            Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+            Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
             // Assert
             List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
@@ -114,19 +112,18 @@ namespace Umbrella.Tests.Expr
             Assert.IsTrue(columnExpressions.Count == 0);
         }
 
-        //[TestMethod]
-        //public void Map_PassAMemberAcessAsProjection_ShouldMapToColumnExpression()
-        //{
-        //    Expression<Func<Person, dynamic>> projector = p => p.Id;
+        [TestMethod]
+        public void Map_PassAMemberAccessAsProjection_ShouldMapToColumnExpression()
+        {
+            Expression<Func<Person, dynamic>> projector = p => p.Id;
 
-        //    Expression projectorMapped = _columnExpressionMapper.Map(projector.Body);
+            Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
-        //    var memberExpression = (MemberExpression)projector.Body;
-        //    var columnExpression = new ColumnExpression(memberExpression);
+            var memberExpression = (MemberExpression)projector.Body;
 
-        //    List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
+            List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
 
-        //    Assert.IsTrue(columnExpression.ColumnDefinition == columnExpressions[0].ColumnDefinition);
-        //}
+            Assert.IsTrue(memberExpression == columnExpressions[0].ColumnDefinition);
+        }
     }
 }

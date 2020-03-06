@@ -3,33 +3,36 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using Umbrella.Exceptions;
 using Umbrella.Expr.Projector;
 using Umbrella.Tests.Mocks;
 
 namespace Umbrella.Tests.Expr
 {
     [TestClass]
-    public class ProjectorValidationTests
+    public class ProjectionValidatorTests
     {
+        private ProjectionValidator _projectionValidator = new ProjectionValidator();
+
 
         [TestMethod]
         public void Validate_FlatProjection_ShouldNotThrowAnException()
         {
             Expression<Func<Person, dynamic>> projector = p => new {p.Id, p.Age};
 
-            Action projectorValidation = () => ProjectorValidator.Validate(projector);
+            Action projectorValidation = () => _projectionValidator.Validate(projector);
 
-            CustomAsserts.NotThrowsException<Exception>(projectorValidation);
+            CustomAsserts.NotThrowsException<InvalidProjectionException>(projectorValidation);
         }
 
         [TestMethod]
-        public void Validate_AnonymousTypeProjectionThatDoNotReferenceProjectorParameter_ShouldThrowAnInvalidOperationException()
+        public void Validate_AnonymousTypeProjectionThatDoNotReferenceProjectorParameter_ShouldThrowAnInvalidProjectionException()
         {
             Expression<Func<Person, dynamic>> projector = p => new { Id = 1, Age = 31 };
 
-            Action projectorValidation = () => ProjectorValidator.Validate(projector);
+            Action projectorValidation = () => _projectionValidator.Validate(projector);
 
-            Assert.ThrowsException<InvalidOperationException>(projectorValidation);
+            Assert.ThrowsException<InvalidProjectionException>(projectorValidation);
         }
 
         [TestMethod]
@@ -37,9 +40,9 @@ namespace Umbrella.Tests.Expr
         {
             Expression<Func<Person, dynamic>> projector = p => new { Id = new { p.Id }, p.Age };
 
-            Action projectorValidation = () => ProjectorValidator.Validate(projector);
+            Action projectorValidation = () => _projectionValidator.Validate(projector);
 
-            Assert.ThrowsException<InvalidOperationException>(projectorValidation);
+            Assert.ThrowsException<InvalidProjectionException>(projectorValidation);
         }
 
         [TestMethod]
@@ -47,9 +50,9 @@ namespace Umbrella.Tests.Expr
         {
             Expression<Func<Person, dynamic>> projector = p => new { NewPerson = new Person() { Id = p.Id }, p.Age };
 
-            Action projectorValidation = () => ProjectorValidator.Validate(projector);
+            Action projectorValidation = () => _projectionValidator.Validate(projector);
 
-            Assert.ThrowsException<InvalidOperationException>(projectorValidation);
+            Assert.ThrowsException<InvalidProjectionException>(projectorValidation);
         }
 
         [TestMethod]
@@ -57,7 +60,7 @@ namespace Umbrella.Tests.Expr
         {
             Expression<Func<int, dynamic>> projector = i => new { Id = i };
 
-            Action projectorValidation = () => ProjectorValidator.Validate(projector);
+            Action projectorValidation = () => _projectionValidator.Validate(projector);
 
             CustomAsserts.NotThrowsException<Exception>(projectorValidation);
         }
@@ -65,12 +68,12 @@ namespace Umbrella.Tests.Expr
 
     public static class CustomAsserts
     {
-        public static void NotThrowsException<T>(Action action) where T: Exception
+        public static void NotThrowsException<TException>(Action action) where TException: Exception
         {
             try
             {
                 action();
-            }catch(T ex)
+            }catch(TException ex)
             {
                 Assert.Fail($"An exception was thrown when executing the given action: {ex.ToString()}");
             }

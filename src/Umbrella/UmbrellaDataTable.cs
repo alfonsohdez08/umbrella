@@ -47,8 +47,8 @@ namespace Umbrella
 
         private DataTable GetDataTable()
         {
-            var columnsMapped = new ColumnsMapped(_projector);
-            List<Column> columns = columnsMapped.GetColumns();
+            var columnsMapping = new ColumnsMapping(_projector);
+            List<Column> columns = columnsMapping.GetColumns();
 
             var dataTable = new DataTable();
             foreach (Column c in columns)
