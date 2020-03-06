@@ -6,14 +6,15 @@ namespace Umbrella.Expr.Nominators
     internal class LocalEvalNominator : Nominator
     {
         private ParameterExpression _parameter;
-        private HashSet<Expression> _nominees = new HashSet<Expression>();
+        private HashSet<Expression> _nominees;
         private bool _isEvaluableLocally = true;
 
         public override HashSet<Expression> Nominate(Expression expression)
         {
             LambdaExpression lambda = (LambdaExpression)expression;
             HashSet<Expression> nominees = null;
-
+            
+            _nominees = new HashSet<Expression>();
             _parameter = lambda.Parameters[0];
 
             try
@@ -24,7 +25,7 @@ namespace Umbrella.Expr.Nominators
             }
             finally
             {
-                _nominees = new HashSet<Expression>();
+                _nominees = null;
                 _parameter = null;
             }
 

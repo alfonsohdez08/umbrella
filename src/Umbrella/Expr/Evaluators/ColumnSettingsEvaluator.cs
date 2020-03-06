@@ -36,7 +36,7 @@ namespace Umbrella.Expr.Evaluators
         {
             Expression body = Visit(expression.Body);
 
-            return LambdaExpression
+            return Expression.Lambda(body, expression.Parameters);
         }
     }
 }

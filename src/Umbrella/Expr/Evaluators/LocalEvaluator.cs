@@ -13,20 +13,21 @@ namespace Umbrella.Expr.Evaluators
 
         public override Expression Evaluate(LambdaExpression expression)
         {
-            var localEvalNominator = new LocalEvalNominator();
-            _nominees = localEvalNominator.Nominate(expression);
+            Expression bodyPartiallyEvaluated = null;
 
-            Expression body = null;
             try
             {
-                body = Visit(expression.Body);
+                var localEvalNominator = new LocalEvalNominator();
+                _nominees = localEvalNominator.Nominate(expression);
+
+                bodyPartiallyEvaluated = Visit(expression.Body);
             }
             finally
             {
                 _nominees = null;
             }
 
-            return Expression.Lambda(body, expression.Parameters);
+            return Expression.Lambda(bodyPartiallyEvaluated, expression.Parameters);
         }
 
         public override Expression Visit(Expression node)

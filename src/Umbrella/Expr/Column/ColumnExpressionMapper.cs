@@ -13,24 +13,26 @@ namespace Umbrella.Expr.Column
         /// <summary>
         /// Maps property's binding expression to a column expression.
         /// </summary>
-        /// <param name="projectorBody">A flat projector (meaning, no nested projections).</param>
+        /// <param name="expression">Projector.</param>
         /// <returns>A projector where each property's binding expression has been replaced by a column expression.</returns>
-        public Expression Map(Expression projectorBody)
+        public Expression Map(Expression expression)
         {
-            var columnsNominator = new ColumnsNominator();
-            _nominatedColumns =  columnsNominator.Nominate(projectorBody);
+            var lambda = (LambdaExpression)expression;
+            Expression projectionMapped = null;
 
-            Expression projectorWithColumnsMapped = null;
             try
             {
-                projectorWithColumnsMapped = Visit(projectorBody);
+                var columnsNominator = new ColumnsNominator();
+                _nominatedColumns = columnsNominator.Nominate(lambda.Body);
+
+                projectionMapped = Visit(lambda.Body);
             }
             finally
             {
                 _nominatedColumns = null;
             }
 
-            return projectorWithColumnsMapped;
+            return Expression.Lambda(projectionMapped, lambda.Parameters);
         }
 
         public override Expression Visit(Expression node)

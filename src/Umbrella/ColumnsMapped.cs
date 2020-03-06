@@ -15,9 +15,9 @@ namespace Umbrella
 {
     internal class ColumnsMapped: ColumnVisitor
     {
-        private readonly List<Column> _columns = new List<Column>();
-        private readonly ParameterExpression _parameter;
-        private readonly Expression _projectorBody;
+        private List<Column> _columns = new List<Column>();
+        private readonly ParameterExpression _projectorParameter;
+        private readonly Expression _projection;
         private readonly ParameterReferencesFinder _parameterFinder = new ParameterReferencesFinder();
 
         private MemberInfo _memberInScope;
@@ -26,38 +26,45 @@ namespace Umbrella
         {
             projector = ShapeProjector(projector);
 
-            _parameter = projector.Parameters[0];
-            _projectorBody = projector.Body;
+            _projectorParameter = projector.Parameters[0];
+            _projection = projector.Body;
         }
 
         private LambdaExpression ShapeProjector(LambdaExpression projector)
         {
-            var parameterProjectedRewritter = new ParameterProjectedRewritter();
-            Expression body = null;
+            var implicitProjectionRewritter = new ImplicitProjectionRewritter();
+            projector = (LambdaExpression)implicitProjectionRewritter.Rewrite(projector);
 
-            body = parameterProjectedRewritter.Rewrite(projector.Body);
-            projector.UpdateBody(body);
+            var localEvaluator = new LocalEvaluator();
+            projector = (LambdaExpression)localEvaluator.Evaluate(projector);
 
-            var localEval = new LocalEvaluator();
-            projector = (LambdaExpression)localEval.Evaluate(projector);
-
-            var columnSettingsRewritter = new ColumnSettingsEvaluator();
-            projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
+            var columnSettingsEvaluator = new ColumnSettingsEvaluator();
+            projector = (LambdaExpression)columnSettingsEvaluator.Evaluate(projector);
 
             var projectionValidator = new ProjectionValidator();
             projectionValidator.Validate(projector);
 
-            var columnExpressionMapper = new ColumnExpressionMapper();
-            projectorBody = columnExpressionMapper.Map(projectorBody);
+            var columnExpressionsMapper = new ColumnExpressionMapper();
+            projector = (LambdaExpression)columnExpressionsMapper.Map(projector);
 
-            return Expression.Lambda(projectorBody, projectorParameter);
+            return projector;
         }
 
         public List<Column> GetColumns()
         {
-            Visit(_projectorBody);
+            List<Column> columns = null;
 
-            return _columns;
+            try
+            {
+                Visit(_projection);
+                columns = _columns;
+            }
+            finally
+            {
+                _columns = null;
+            }
+
+            return columns;
         }
 
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment ma)
@@ -120,12 +127,12 @@ namespace Umbrella
                 throw new InvalidOperationException("The column data type is not valid.");
 
             LambdaExpression le = null;
-            bool isParameterless = !_parameterFinder.Find(columnDefinition, _parameter);
+            bool isParameterless = !_parameterFinder.Find(columnDefinition, _projectorParameter);
 
             if (isParameterless)
                 le = Expression.Lambda(columnDefinition);
             else
-                le = Expression.Lambda(columnDefinition, _parameter);
+                le = Expression.Lambda(columnDefinition, _projectorParameter);
 
             var column = new Column()
             {

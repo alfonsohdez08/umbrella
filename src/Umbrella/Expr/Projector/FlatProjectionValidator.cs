@@ -17,10 +17,14 @@ namespace Umbrella.Expr.Projector
             {
                 _projection = expression;
                 Visit(expression);
+
+                if (_newExpInScope == null)
+                    throw new InvalidProjectionException("The projection does not denote an object instantiation.", expression);
             }
             finally
             {
                 _projection = null;
+                _newExpInScope = null;
             }
         }
 

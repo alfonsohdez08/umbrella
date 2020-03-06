@@ -32,5 +32,15 @@ namespace Umbrella.Extensions
             return type.IsPrimitive || type == typeof(string) || type == typeof(DateTime);
         }
 
+        /// <summary>
+        /// Determines whether a given type is a struct or not.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <returns>True if it's a struct; otherwise false.</returns>
+        public static bool IsStruct(this Type type)
+        {
+            return type.IsValueType && !type.IsPrimitive && (type != typeof(DateTime));
+        }
+
     }
 }

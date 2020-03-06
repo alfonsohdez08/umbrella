@@ -14,7 +14,7 @@ namespace Umbrella.Expr.Projector
 
             var paramFinder = new ParameterReferencesFinder();
             if (!paramFinder.Find(projector.Body, projector.Parameters[0]))
-                throw new InvalidProjectionException("The projection does not hold any reference to the projector's parameter", projector.Body);
+                throw new InvalidProjectionException("The projector does not project one of the members from the input collection.", projector.Body);
         }
     }
 }

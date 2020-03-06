@@ -18,11 +18,6 @@ namespace Umbrella.Expr.Projector
 
             var flatProjectionValidator = new FlatProjectionValidator();
             flatProjectionValidator.Validate(expression);
-
-            //// should i check this using a visitor?
-            //// (Product p) => (object)(p => new {p.Id, p.UnitPrice}) the projector is trapped in a cast expression (unaryexpression)
-            //if (!(projector.Body.NodeType == ExpressionType.New || projector.Body.NodeType == ExpressionType.MemberInit))
-            //    throw new ArgumentException("The given projector should denote an object instantiation.");
         }
     }
 }
