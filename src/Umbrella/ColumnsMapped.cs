@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Umbrella.Exceptions;
 using Umbrella.Expr;
 using Umbrella.Expr.Column;
 using Umbrella.Expr.Evaluators;
@@ -124,7 +125,7 @@ namespace Umbrella
             }
 
             if (!columnDataType.IsBuiltInType())
-                throw new InvalidOperationException("The column data type is not valid.");
+                throw new InvalidColumnDataTypeException($"The data type for the column \"{columnName}\" is invalid: {columnDataType.ToString()}.");
 
             LambdaExpression le = null;
             bool isParameterless = !_parameterFinder.Find(columnDefinition, _projectorParameter);

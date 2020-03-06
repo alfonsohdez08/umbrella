@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
+using Umbrella.Expr.Evaluators;
 using Umbrella.Expr.Projector;
 using Umbrella.Tests.Mocks;
 

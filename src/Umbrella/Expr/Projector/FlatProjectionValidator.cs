@@ -19,7 +19,7 @@ namespace Umbrella.Expr.Projector
                 Visit(expression);
 
                 if (_newExpInScope == null)
-                    throw new InvalidProjectionException("The projection does not denote an object instantiation.", expression);
+                    throw new InvalidProjectionException("The projection does not denote an object creation/instantiation.", expression);
             }
             finally
             {
@@ -33,7 +33,7 @@ namespace Umbrella.Expr.Projector
             if (_newExpInScope == null)
                 _newExpInScope = ne;
             else
-                throw new InvalidProjectionException("The projection is invalid because has nested new operators.", _projection);
+                throw new InvalidProjectionException("The projection is invalid because has nested projection(s).", _projection);
 
             return base.VisitNew(ne);
         }
