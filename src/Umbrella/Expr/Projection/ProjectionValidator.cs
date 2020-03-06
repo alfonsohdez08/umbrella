@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Umbrella.Expr.Projector
+namespace Umbrella.Expr.Projection
 {
     internal class ProjectionValidator : IExpressionValidator
     {
@@ -13,7 +13,7 @@ namespace Umbrella.Expr.Projector
         /// <param name="expression">The projector.</param>
         public void Validate(Expression expression)
         {
-            var paramProjectionValidator = new ParameterProjectionValidator();
+            var paramProjectionValidator = new ParameterReferencesValidator();
             paramProjectionValidator.Validate(expression);
 
             var flatProjectionValidator = new FlatProjectionValidator();

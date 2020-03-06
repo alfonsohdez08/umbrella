@@ -9,7 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Umbrella.Extensions;
 using Umbrella.Expr.Rewritters;
-using Umbrella.Expr.Projector;
+using Umbrella.Expr.Projection;
 using Umbrella.Expr.Column;
 
 namespace Umbrella

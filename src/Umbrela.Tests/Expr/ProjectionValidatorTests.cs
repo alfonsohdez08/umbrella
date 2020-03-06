@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Exceptions;
-using Umbrella.Expr.Projector;
+using Umbrella.Expr.Projection;
 using Umbrella.Tests.Mocks;
 
 namespace Umbrella.Tests.Expr

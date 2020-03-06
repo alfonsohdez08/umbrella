@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace Umbrella.Expr.Projector
+namespace Umbrella.Expr.Projection
 {
     internal interface IExpressionValidator
     {

@@ -4,9 +4,9 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Exceptions;
 
-namespace Umbrella.Expr.Projector
+namespace Umbrella.Expr.Projection
 {
-    internal class ParameterProjectionValidator : ExpressionVisitor, IExpressionValidator
+    internal class ParameterReferencesValidator : ExpressionVisitor, IExpressionValidator
     {
         public void Validate(Expression expression)
         {

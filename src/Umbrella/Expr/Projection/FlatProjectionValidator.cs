@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Exceptions;
 
-namespace Umbrella.Expr.Projector
+namespace Umbrella.Expr.Projection
 {
     internal class FlatProjectionValidator : ExpressionVisitor, IExpressionValidator
     {

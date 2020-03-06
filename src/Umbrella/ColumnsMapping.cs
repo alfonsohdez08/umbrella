@@ -8,7 +8,7 @@ using Umbrella.Exceptions;
 using Umbrella.Expr;
 using Umbrella.Expr.Column;
 using Umbrella.Expr.Evaluators;
-using Umbrella.Expr.Projector;
+using Umbrella.Expr.Projection;
 using Umbrella.Expr.Rewritters;
 using Umbrella.Extensions;
 
