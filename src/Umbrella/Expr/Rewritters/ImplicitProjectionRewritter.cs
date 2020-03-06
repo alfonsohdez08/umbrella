@@ -11,7 +11,7 @@ namespace Umbrella.Expr.Rewritters
     /// <summary>
     /// Rewrittes a projector that has as body a ParameterExpression.
     /// </summary>
-    internal class ParameterProjectedRewritter : ExpressionRewritter
+    internal class ImplicitProjectionRewritter : ExpressionRewritter
     {
         protected override Expression VisitParameter(ParameterExpression p)
         {
@@ -52,18 +52,25 @@ namespace Umbrella.Expr.Rewritters
                 MemberInitExpression mi = Expression.MemberInit(ne, memberBindings);
 
                 return mi;
+            }else if (type.IsStruct())
+            {
+                // when it's a struct, reflect its properties
             }
 
-            throw new InvalidOperationException("The projected parameter is not a complex type. Please use the new operator for project the non complex parameter.");
+            throw new InvalidOperationException("The implicit projection should reflect an object, not a primitive.");
         }
 
-        public override Expression Rewrite(Expression projectorBody)
+        public override Expression Rewrite(Expression expression)
         {
-            bool isParameterProjected = projectorBody is ParameterExpression;
-            if (isParameterProjected)
-                return Visit(projectorBody);
+            var projector = (LambdaExpression)expression;
+            if (projector.Body is ParameterExpression) // this may be handled by a visitor
+            {
+                Expression explicitProjection = Visit(projector.Body);
 
-            return projectorBody;
+                return Expression.Lambda(explicitProjection, projector.Parameters);
+            }
+
+            return expression;
         }
     }
 }

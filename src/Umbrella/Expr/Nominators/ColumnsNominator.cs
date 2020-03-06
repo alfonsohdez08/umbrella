@@ -34,6 +34,8 @@ namespace Umbrella.Expr.Nominators
 
         public override HashSet<Expression> Nominate(Expression expression)
         {
+            _nominees = new HashSet<Expression>();
+
             HashSet<Expression> nominees = null;
 
             try
@@ -44,7 +46,7 @@ namespace Umbrella.Expr.Nominators
             }
             finally
             {
-                _nominees = new HashSet<Expression>();
+                _nominees = null;
             }
 
             return nominees;

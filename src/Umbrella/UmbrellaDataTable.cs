@@ -16,10 +16,10 @@ namespace Umbrella
 {
     internal class UmbrellaDataTable<T>
     {
-        private readonly Expression _projector;
+        private readonly LambdaExpression _projector;
         private readonly IEnumerable<T> _source;
 
-        private UmbrellaDataTable(IEnumerable<T> source, Expression projector)
+        private UmbrellaDataTable(IEnumerable<T> source, LambdaExpression projector)
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
@@ -40,35 +40,15 @@ namespace Umbrella
         /// <returns>A filled DataTable.</returns>
         public static DataTable Build<TEntity>(IEnumerable<TEntity> source, Expression projector)
         {
-            LambdaExpression projectorLambdaExp = (LambdaExpression)projector;
-
-            ParameterExpression projectorParameter = projectorLambdaExp.Parameters[0];
-            Expression projectorBody = projectorLambdaExp.Body;
-
-            var parameterProjectedRewritter = new ParameterProjectedRewritter();
-            projectorBody = parameterProjectedRewritter.Rewrite(projectorBody);
-
-            var localEval = new ProjectorLocalEvaluator();
-            projectorBody = localEval.Evaluate(projectorBody, projectorParameter);
-
-            var columnSettingsRewritter = new ColumnSettingsRewritter();
-            projectorBody = columnSettingsRewritter.Rewrite(projectorBody);
-
-            ProjectorValidator.Validate(projectorBody, projectorParameter);
-
-            var columnExpressionMapper = new ColumnExpressionMapper();
-            projectorBody = columnExpressionMapper.Map(projectorBody);
-            
-            LambdaExpression newProjector = Expression.Lambda(projectorBody, projectorParameter);
-            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, newProjector);
+            var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, (LambdaExpression)projector);
 
             return umbrellaDataTable.GetDataTable();
         }
 
         private DataTable GetDataTable()
         {
-            var columnsMapped = new ColumnsMapped(_projector);
-            List<Column> columns = columnsMapped.GetColumns();
+            var columnsMapping = new ColumnsMapping(_projector);
+            List<Column> columns = columnsMapping.GetColumns();
 
             var dataTable = new DataTable();
             foreach (Column c in columns)

@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella", "Umbrella\Umbrella.csproj", "{6BEA566C-60CE-4F5B-B2DB-689A10471586}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella", "Umbrella\Umbrella.csproj", "{6BEA566C-60CE-4F5B-B2DB-689A10471586}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umbrella.UnitTests", "Umbrela.UnitTests\Umbrella.UnitTests.csproj", "{4CA4AEE4-4993-4A05-8E1A-ADAAF1271C77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Umbrella.Tests", "Umbrela.Tests\Umbrella.Tests.csproj", "{4CA4AEE4-4993-4A05-8E1A-ADAAF1271C77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

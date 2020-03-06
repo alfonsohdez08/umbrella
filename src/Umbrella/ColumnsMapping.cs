@@ -4,34 +4,68 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using Umbrella.Exceptions;
 using Umbrella.Expr;
 using Umbrella.Expr.Column;
+using Umbrella.Expr.Evaluators;
+using Umbrella.Expr.Projector;
+using Umbrella.Expr.Rewritters;
 using Umbrella.Extensions;
 
 namespace Umbrella
 {
-    internal class ColumnsMapped: ColumnVisitor
+    internal class ColumnsMapping: ColumnVisitor
     {
-        private readonly List<Column> _columns = new List<Column>();
-        private readonly ParameterExpression _parameter;
-        private readonly Expression _projectorBody;
+        private List<Column> _columns = new List<Column>();
+        private readonly ParameterExpression _projectorParameter;
+        private readonly Expression _projection;
         private readonly ParameterReferencesFinder _parameterFinder = new ParameterReferencesFinder();
 
         private MemberInfo _memberInScope;
 
-        public ColumnsMapped(Expression projector)
+        public ColumnsMapping(LambdaExpression projector)
         {
-            var lambdaExp = (LambdaExpression)projector;
+            projector = ShapeProjector(projector);
 
-            _parameter = lambdaExp.Parameters[0];
-            _projectorBody = lambdaExp.Body;
+            _projectorParameter = projector.Parameters[0];
+            _projection = projector.Body;
+        }
+
+        private LambdaExpression ShapeProjector(LambdaExpression projector)
+        {
+            var implicitProjectionRewritter = new ImplicitProjectionRewritter();
+            projector = (LambdaExpression)implicitProjectionRewritter.Rewrite(projector);
+
+            var localEvaluator = new LocalEvaluator();
+            projector = (LambdaExpression)localEvaluator.Evaluate(projector);
+
+            var columnSettingsEvaluator = new ColumnSettingsEvaluator();
+            projector = (LambdaExpression)columnSettingsEvaluator.Evaluate(projector);
+
+            var projectionValidator = new ProjectionValidator();
+            projectionValidator.Validate(projector);
+
+            var columnExpressionsMapper = new ColumnExpressionMapper();
+            projector = (LambdaExpression)columnExpressionsMapper.Map(projector);
+
+            return projector;
         }
 
         public List<Column> GetColumns()
         {
-            Visit(_projectorBody);
+            List<Column> columns = null;
 
-            return _columns;
+            try
+            {
+                Visit(_projection);
+                columns = _columns;
+            }
+            finally
+            {
+                _columns = null;
+            }
+
+            return columns;
         }
 
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment ma)
@@ -65,15 +99,15 @@ namespace Umbrella
 
                 _memberInScope = null;
             }
-            else
-            {
-                var m = c.ColumnDefinition as MemberExpression;
-                if (m == null)
-                    throw new NotSupportedException($"Can not understand this projector's part: {c.ColumnDefinition.ToString()}");
+            //else
+            //{
+            //    var m = c.ColumnDefinition as MemberExpression;
+            //    if (m == null)
+            //        throw new NotSupportedException($"Can not understand this projector's part: {c.ColumnDefinition.ToString()}");
 
-                columnName = m.Member.Name;
-                columnDataType = ((PropertyInfo)m.Member).PropertyType;
-            }
+            //    columnName = m.Member.Name;
+            //    columnDataType = ((PropertyInfo)m.Member).PropertyType;
+            //}
 
             Type nullableType = Nullable.GetUnderlyingType(columnDataType);
             if (nullableType != null)
@@ -91,15 +125,15 @@ namespace Umbrella
             }
 
             if (!columnDataType.IsBuiltInType())
-                throw new InvalidOperationException("The column data type is not valid.");
+                throw new InvalidColumnDataTypeException($"The data type for the column \"{columnName}\" is invalid: {columnDataType.ToString()}.");
 
             LambdaExpression le = null;
-            bool isParameterless = !_parameterFinder.Find(columnDefinition, _parameter);
+            bool isParameterless = !_parameterFinder.Find(columnDefinition, _projectorParameter);
 
             if (isParameterless)
                 le = Expression.Lambda(columnDefinition);
             else
-                le = Expression.Lambda(columnDefinition, _parameter);
+                le = Expression.Lambda(columnDefinition, _projectorParameter);
 
             var column = new Column()
             {
