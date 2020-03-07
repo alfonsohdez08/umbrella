@@ -1,15 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Expr.Evaluators;
 using Umbrella.Expr.Projection;
 using Umbrella.Tests.Mocks;
+using Xunit;
 
 namespace Umbrella.Tests.Expr
 {
-    [TestClass]
     public class ProjectorLocalEvaluatorTests
     {
         private LocalEvaluator _localEvaluator = new LocalEvaluator();
@@ -20,7 +19,7 @@ namespace Umbrella.Tests.Expr
         //    _localEvaluator = new LocalEvaluator();
         //}
 
-        [TestMethod]
+        [Fact(DisplayName = "When pass an instance method that one of its parameter is a projector's parameter member within the projection, it should not execute the instance method locally.")]
         public void Evaluate_PassAnInstanceMethodInTheProjectorThatReferenceTheProjectoParameter_ShouldNotExecuteTheMethodLocally()
         {
             // Arrange
@@ -32,10 +31,10 @@ namespace Umbrella.Tests.Expr
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
 
-            Assert.IsTrue(newExpArgs[1].NodeType == ExpressionType.Call);
+            Assert.True(newExpArgs[1].NodeType == ExpressionType.Call);
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When pass a parameterless static method within the projection, it should execute the static method and replace the method's calling by its result as a constant within the projection.")]
         public void Evaluate_PassAStaticMethodInTheProjectorThatDoNotReferenceTheProjectoParameter_ShouldExecuteTheMethodAndTreatItsResultAsAConstant()
         {
             Expression<Func<Person, dynamic>> projector = p => new { PersonId = p.Id, TaxCounselor = TaxService.GetClosestTaxCounselor() };
@@ -46,10 +45,10 @@ namespace Umbrella.Tests.Expr
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
 
-            Assert.IsTrue(newExpArgs[1] is ConstantExpression constantExp && (string)constantExp.Value == TaxService.GetClosestTaxCounselor());
+            Assert.True(newExpArgs[1] is ConstantExpression constantExp && (string)constantExp.Value == TaxService.GetClosestTaxCounselor());
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When pass an inline condition that do not reference the projector's parameter within the projection, it should execute it locally and replace the inline condition by its value as a constant within the projection.")]
         public void Evaluate_PassAnInlineConditionThatDoNotReferenceTheProjectorParameter_ShouldExecuteItLocallyAndTreatItAsAConstant()
         {
             // Arrange
@@ -62,10 +61,10 @@ namespace Umbrella.Tests.Expr
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
 
             bool canGetIncomingTax = new TaxService().IsIncomingTaxSeason() ? true : false;
-            Assert.IsTrue(newExpArgs[1] is ConstantExpression constantExp && (bool)constantExp.Value == canGetIncomingTax);
+            Assert.True(newExpArgs[1] is ConstantExpression constantExp && (bool)constantExp.Value == canGetIncomingTax);
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When pass an inline condition that references the projector's parameter within the projection, it should not execute it locally.")]
         public void Evaluate_PassAnInlineConditionThatReferenceTheProjectorParameter_ShouldNotExecuteItLocally()
         {
             // Arrange
@@ -77,7 +76,7 @@ namespace Umbrella.Tests.Expr
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
 
-            Assert.IsTrue(newExpArgs[1] is ConditionalExpression);
+            Assert.True(newExpArgs[1] is ConditionalExpression);
         }
     }
 }

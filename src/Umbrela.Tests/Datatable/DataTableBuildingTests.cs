@@ -1,24 +1,21 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 using System.Linq;
-using Newtonsoft.Json;
 using Umbrella.Tests;
 using Umbrella.Tests.Mocks;
 using static Umbrella.Tests.Datatable.RowsMappingHelper;
+using Xunit;
 
 namespace Umbrella.Tests.Datatable
 {
-    [TestClass]
-    public class RowsMappingTests
+    public class DataTableBuildingTests
     {
-        private IEnumerable<Person> _people;
+        private readonly IEnumerable<Person> _people;
 
-        [TestInitialize]
-        public void Init()
+        public DataTableBuildingTests()
         {
             _people = new List<Person>()
             {
@@ -29,52 +26,52 @@ namespace Umbrella.Tests.Datatable
             };
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When projects to an anonmyous type where one of its properties is mapped to a concat of two projector's properties, the DataTable's rows should have the value according to what was projected.")]
         public void ToDataTable_ProjectToAnonymousTypeThatHasAPropertyBindedToAStringConcat_ShouldGenerateADtWhereTheValuesAllocatedForThatColumnMustHaveTheDataBasedOnTheProjector()
         {
             Expression<Func<Person, dynamic>> projector = p => new {FullName = p.FirstName + " " + p.LastName};
 
             DataTable dataTable = _people.ToDataTable(projector);
             
-            Assert.IsTrue(
-                ValidateRowsAreMapped(_people.Select(p => new { FullName = p.FirstName + " " + p.LastName }), dataTable, (p, r) => p.FullName == (string)r["FullName"])
+            Assert.True(
+                  ValidateRowsAreMapped(_people.Select(p => new { FullName = p.FirstName + " " + p.LastName }), dataTable, (p, r) => p.FullName == (string)r["FullName"])
                 );
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When projects to an user defined type, it should generate a DataTable where its columns are the member initialized within the projection.")]
         public void ToDataTable_ProjectToAnUserDefinedType_ShouldGenerateADtWhereTheRowsValuesAreEqualToTheInputCollection()
         {
             Expression<Func<Person, dynamic>> projector = p => new Person() { DateOfBirth = p.DateOfBirth };
 
             DataTable dataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(ValidateRowsAreMapped(_people, dataTable, (p, r) => p.DateOfBirth == (DateTime)r["DateOfBirth"]));
+            Assert.True(ValidateRowsAreMapped(_people, dataTable, (p, r) => p.DateOfBirth == (DateTime)r["DateOfBirth"]));
         }
 
-        [TestMethod]
-        public void ToDataTable_PassAStaticMethodInTheProjector_ShouldRunLocallyThatMethodAndTreatItsResultAsAConstant()
-        {
-            Expression<Func<Person, dynamic>> projector = p => new { p.Id, BornPlace = Place.GetPlace()};
+        //[TestMethod]
+        //public void ToDataTable_PassAStaticMethodInTheProjector_ShouldRunLocallyThatMethodAndTreatItsResultAsAConstant()
+        //{
+        //    Expression<Func<Person, dynamic>> projector = p => new { p.Id, BornPlace = Place.GetPlace()};
 
-            DataTable dataTable = _people.ToDataTable(projector);
+        //    DataTable dataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(
-                ValidateRowsAreMapped(_people.Select(p => new { p.Id, BornPlace = Place.GetPlace() }), dataTable, (p, r) => p.BornPlace == (string)r["BornPlace"])
-            );
-        }
+        //    Assert.IsTrue(
+        //        ValidateRowsAreMapped(_people.Select(p => new { p.Id, BornPlace = Place.GetPlace() }), dataTable, (p, r) => p.BornPlace == (string)r["BornPlace"])
+        //    );
+        //}
 
-        [TestMethod]
-        public void ToDataTable_PassAnInstanceMethodInTheProjector_ShouldRunLocallyTheMethodAndTreatItsResultAsAConstant()
-        {
-            var place = new Place();
-            Expression<Func<Person, dynamic>> projector = p => new { BornPlace = ColumnSettings.Build(() => place.GetPlace(false)).Name("Born Place"), p.IsAlive};
+        //[TestMethod]
+        //public void ToDataTable_PassAnInstanceMethodInTheProjector_ShouldRunLocallyTheMethodAndTreatItsResultAsAConstant()
+        //{
+        //    var place = new Place();
+        //    Expression<Func<Person, dynamic>> projector = p => new { BornPlace = ColumnSettings.Build(() => place.GetPlace(false)).Name("Born Place"), p.IsAlive};
 
-            DataTable dataTable = _people.ToDataTable(projector);
+        //    DataTable dataTable = _people.ToDataTable(projector);
 
-            Assert.IsTrue(
-                ValidateRowsAreMapped(_people.Select(p => new { BornPlace = place.GetPlace(false)}), dataTable, (p, r) => p.BornPlace == (string)r["Born Place"])
-                );
-        }
+        //    Assert.IsTrue(
+        //        ValidateRowsAreMapped(_people.Select(p => new { BornPlace = place.GetPlace(false)}), dataTable, (p, r) => p.BornPlace == (string)r["Born Place"])
+        //        );
+        //}
 
         //[TestMethod]
         //public void ToDataTable_PassAConstantAsProjector_ShouldThrowAnExceptionBecauseTheProjectorIsNotReferencingAnyInputTypeProperty()

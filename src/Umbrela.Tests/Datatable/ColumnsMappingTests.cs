@@ -1,53 +1,45 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 using Umbrella.Tests;
 using Umbrella.Tests.Mocks;
+using Xunit;
 
 namespace Umbrella.Tests.Datatable
 {
-    [TestClass]
     public class ColumnsMappingTests
     {
-        private ColumnsMapping _columnsMapped;
 
-        [TestInitialize]
-        public void Init()
-        {
-            _columnsMapped = null;
-        }
-
-        [TestMethod]
+        [Fact(DisplayName = "When projects to an anonymous type, it should generate columns based on the properties projected.")]
         public void ToDataTable_ProjectToAnonymousType_ShouldGenerateDataTableColumnsBasedOnTheProjectionProperties()
         {
             Expression<Func<Person, dynamic>> projector = p => new { ID = p.Id, p.FirstName, p.LastName, DOB = p.DateOfBirth };
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.IsTrue(columns.HasAllColumns("ID", "FirstName", "LastName", "DOB"));
+            Assert.True(columns.HasAllColumns("ID", "FirstName", "LastName", "DOB"));
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When projects to an user defined type, it should generate columns based on the members initialized.")]
         public void ToDataTable_ProjectToUserDefinedType_ShouldGenerateDataTableColumnsWhereItsColumnsArePropertiesInitialized()
         {
             Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id, IsAlive = p.IsAlive };
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            columns.HasAllColumns("Id", "IsAlive");
+            Assert.True(columns.HasAllColumns("Id", "IsAlive"));
         }
 
-        [TestMethod]
+        [Fact(DisplayName = "When it's an implicit projection of an user defined type, it should generate columns based on the writable properties.")]
         public void ToDataTable_ProjectToParameter_ShouldImplicitilyGenerateADataTableColumnsBasedOnParameterTypeProperties()
         {
             Expression<Func<Person, dynamic>> projector = p => p;
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.IsTrue(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
+            Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
         }
 
         //[TestMethod]
