@@ -10,12 +10,15 @@ namespace Umbrella.Extensions
     {
 
         /// <summary>
-        /// src: copied from Stackoverflow
+        /// Determines whether a type is an anonymous one or not.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="type">Type.</param>
+        /// <returns>True if it's an anonymous type; otherwise false.</returns>
         public static bool IsAnonymousType(this Type type)
         {
+            // Source: https://stackoverflow.com/questions/1650681/determining-whether-a-type-is-an-anonymous-type
+            // is there heuristic way to determine whether a type is an anonymous type or not?
+
             bool hasCompilerGeneratedAttribute = type.GetCustomAttributes(typeof(CompilerGeneratedAttribute), false).Length > 0;
             bool nameContainsAnonymousType = type.FullName.Contains("AnonymousType");
             

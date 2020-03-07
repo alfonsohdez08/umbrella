@@ -77,6 +77,7 @@ namespace Umbrella
 
         protected override Expression VisitNew(NewExpression ne)
         {
+            //TODO: Check whether when arguments are provided to an user defined constructor (For raise an exception)
             for (int index = 0; index < ne.Arguments.Count; index++)
             {
                 _memberInScope = ne.Members[index];

@@ -33,7 +33,7 @@ namespace Umbrella.Expr.Rewritters
 
                 return ne;
             }
-            else if (type.IsClass)
+            else if (type.IsClass || type.IsStruct())
             {
                 ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
                 NewExpression ne = Expression.New(constructor);
@@ -52,9 +52,6 @@ namespace Umbrella.Expr.Rewritters
                 MemberInitExpression mi = Expression.MemberInit(ne, memberBindings);
 
                 return mi;
-            }else if (type.IsStruct())
-            {
-                // when it's a struct, reflect its properties
             }
 
             throw new InvalidOperationException("The implicit projection should reflect an object, not a primitive.");
@@ -63,7 +60,7 @@ namespace Umbrella.Expr.Rewritters
         public override Expression Rewrite(Expression expression)
         {
             var projector = (LambdaExpression)expression;
-            if (projector.Body is ParameterExpression) // this may be handled by a visitor
+            if (projector.Body.NodeType == ExpressionType.Parameter)
             {
                 Expression explicitProjection = Visit(projector.Body);
 

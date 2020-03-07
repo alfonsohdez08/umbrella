@@ -35,7 +35,7 @@ namespace Umbrella.Expr.Evaluators
             if (node == null)
                 return node;
 
-            if (_nominees.Contains(node) && node.Type.IsBuiltInType())
+            if (_nominees.Contains(node))
             {
                 LambdaExpression le = Expression.Lambda(node, null);
                 Delegate del = le.Compile();

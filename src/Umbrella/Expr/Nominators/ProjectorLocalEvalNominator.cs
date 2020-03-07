@@ -32,6 +32,14 @@ namespace Umbrella.Expr.Nominators
             return nominees;
         }
 
+        protected override Expression VisitMemberInit(MemberInitExpression mi)
+        {
+            // Suppress the visit of NewExpression for avoid nominating it
+            Visit(mi.Bindings, VisitMemberBinding);
+
+            return mi;
+        }
+
         public override Expression Visit(Expression node)
         {
             if (node == null)
