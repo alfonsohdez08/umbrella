@@ -35,11 +35,14 @@ namespace Umbrella.Tests.Datatable
         [Fact(DisplayName = "When it's an implicit projection of an user defined type, it should generate columns based on the writable properties.")]
         public void ToDataTable_ProjectToParameter_ShouldImplicitilyGenerateADataTableColumnsBasedOnParameterTypeProperties()
         {
-            Expression<Func<Person, dynamic>> projector = p => p;
+            //Expression<Func<Person, dynamic>> projector = p => p;
+            Expression<Func<Person, dynamic>> projector = p => ColumnSettings.Build(() => p.FirstName + " " + p.LastName).Name("Full Name");
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
+            Assert.True(columns.HasAllColumns("Full Name"));
+
+            //Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
         }
 
         //[TestMethod]

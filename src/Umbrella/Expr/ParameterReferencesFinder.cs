@@ -33,5 +33,13 @@ namespace Umbrella.Expr
 
             return p;
         }
+
+        protected override Expression VisitConstant(ConstantExpression c)
+        {
+            if (c.Value is ColumnSettings columnSettings)
+                Visit(columnSettings.Mapper);
+
+            return c;
+        }
     }
 }

@@ -8,9 +8,9 @@ using Umbrella.Exceptions;
 
 namespace Umbrella.Expr.Rewritters
 {
-    internal class MemberAccessProjectionRewritter : ExpressionRewritter
+    internal class SingleProjectionRewritter : ExpressionRewritter
     {
-        private Stack<MemberExpression> _members = new Stack<MemberExpression>();
+        private Stack<Expression> _expressions = new Stack<Expression>();
 
         public override Expression Rewrite(Expression expression)
         {
@@ -25,18 +25,38 @@ namespace Umbrella.Expr.Rewritters
             Visit(lambda.Body);
 
             Expression projection = null;
-            if (_members.Count == 1)
+            if (_expressions.Count == 1)
             {
-                MemberExpression memberExp = _members.Pop();
+                Expression singleExpression = _expressions.Pop();
+                string propertyName = string.Empty;
+                Type propertyType = lambda.Body.Type;
+
+                if (singleExpression.NodeType == ExpressionType.MemberAccess)
+                {
+                    MemberExpression memberExp = (MemberExpression)singleExpression;
+                    
+                    propertyName = memberExp.Member.Name;
+                    //propertyType = lambda.Body.Type;
+                }
+                else
+                {
+                    var columnSettings = (ColumnSettings)((ConstantExpression)singleExpression).Value;
+
+                    propertyName = columnSettings.ColumnName;
+                    if (string.IsNullOrEmpty(propertyName))
+                        throw new InvalidOperationException($"The {typeof(ColumnSettings).Name} does not have a name. Ensure you specify it.");
+
+                    //propertyType = typeof(ColumnSettings);
+                }
 
                 var properties = new Dictionary<string, Type>();
-                properties.Add(memberExp.Member.Name, lambda.Body.Type);
+                properties.Add(propertyName, propertyType);
 
                 Type anonymousType = AnonymousTypeUtils.CreateType(properties);
                 Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
 
                 projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] {anonymousType.GetProperties()[0]});
-            } else if (_members.Count > 1)
+            } else if (_expressions.Count > 1)
             {
                 throw new InvalidProjectionException("There are multiple members across the projection. Ensure you project a single member, otherwise wrap it using a new operator.", lambda.Body);
             }
@@ -44,12 +64,20 @@ namespace Umbrella.Expr.Rewritters
             return Expression.Lambda(projection, lambda.Parameters);
         }
 
+        protected override Expression VisitConstant(ConstantExpression c)
+        {
+            if (c.Type == typeof(ColumnSettings))
+                _expressions.Push(c);
+
+            return c;
+        }
+
         protected override Expression VisitMember(MemberExpression m)
         {
             // A member accessing chain is allowed: (Customer c) => c.Address.Name
 
             // Only visits the top node of a member accessing
-            _members.Push(m);
+            _expressions.Push(m);
 
             return m;
         }

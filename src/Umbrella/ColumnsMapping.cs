@@ -42,7 +42,10 @@ namespace Umbrella
             var columnSettingsEvaluator = new ColumnSettingsEvaluator();
             projector = (LambdaExpression)columnSettingsEvaluator.Evaluate(projector);
 
-            var memberAccessProjRewritter = new MemberAccessProjectionRewritter();
+            // Rewrites if the projection is in the form of:
+            // (Customer c) => c.Address.FirstStreet
+            // (Customer c) => ColumnSettings.Build(() => c.FirstName + " " + c.LastName).Name("Full Name")
+            var memberAccessProjRewritter = new SingleProjectionRewritter();
             projector = (LambdaExpression)memberAccessProjRewritter.Rewrite(projector);
 
             var projectionValidator = new ProjectionValidator();
