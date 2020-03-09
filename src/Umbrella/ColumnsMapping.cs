@@ -42,7 +42,8 @@ namespace Umbrella
             var columnSettingsEvaluator = new ColumnSettingsEvaluator();
             projector = (LambdaExpression)columnSettingsEvaluator.Evaluate(projector);
 
-            // add here the member projection rewritter
+            var memberAccessProjRewritter = new MemberAccessProjectionRewritter();
+            projector = (LambdaExpression)memberAccessProjRewritter.Rewrite(projector);
 
             var projectionValidator = new ProjectionValidator();
             projectionValidator.Validate(projector);

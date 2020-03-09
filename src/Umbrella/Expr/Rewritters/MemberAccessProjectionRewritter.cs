@@ -8,7 +8,7 @@ using Umbrella.Exceptions;
 
 namespace Umbrella.Expr.Rewritters
 {
-    internal class MemberAccessProjectedRewritter : ExpressionRewritter
+    internal class MemberAccessProjectionRewritter : ExpressionRewritter
     {
         private Stack<MemberExpression> _accesses = new Stack<MemberExpression>();
 
@@ -22,8 +22,7 @@ namespace Umbrella.Expr.Rewritters
             if (projectionVisitor.IsProjectingAnComplexType)
                 return expression;
 
-            if (lambda.Body.NodeType == ExpressionType.MemberAccess)
-                Visit(lambda.Body);
+            Visit(lambda.Body);
 
             Expression projection = null;
             if (_accesses.Count == 1)
@@ -31,18 +30,23 @@ namespace Umbrella.Expr.Rewritters
                 MemberExpression memberExp = _accesses.Pop();
 
                 var properties = new Dictionary<string, Type>();
-                properties.Add(memberExp.Member.Name, memberExp.Type);
+                properties.Add(memberExp.Member.Name, lambda.Body.Type);
 
-                Type anonymousType = AnonymousType.CreateAnonymousType(properties);
-                Type[] types = anonymousType.GetMembers().Select(m => m.GetType()).ToArray();
+                Type anonymousType = AnonymousTypeUtils.CreateType(properties);
+                Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
 
-                projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] { memberExp.Member });
+                projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] {anonymousType.GetProperties()[0]});
+
+                //Type anonymousType = AnonymousType.CreateAnonymousType(properties);
+                //Type[] types = anonymousType.GetMembers().Select(m => m.GetType()).ToArray();
+
+                //projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] { memberExp.Member });
             } else if (_accesses.Count > 1)
             {
-                //throw exception
+                throw new InvalidProjectionException("Can not rewrite a compound member acesses expression to a complete projection.", lambda.Body);
             }
 
-            return projection;
+            return Expression.Lambda(projection, lambda.Parameters);
         }
 
         protected override Expression VisitMember(MemberExpression m)
