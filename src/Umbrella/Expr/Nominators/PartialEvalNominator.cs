@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace Umbrella.Expr.Nominators
 {
-    internal class LocalEvalNominator : Nominator
+    internal class PartialEvalNominator : Nominator
     {
         private ParameterExpression _parameter;
         private HashSet<Expression> _nominees;
@@ -30,14 +30,6 @@ namespace Umbrella.Expr.Nominators
             }
 
             return nominees;
-        }
-
-        protected override Expression VisitMemberInit(MemberInitExpression mi)
-        {
-            // Suppress the visit of NewExpression for avoid nominating it
-            Visit(mi.Bindings, VisitMemberBinding);
-
-            return mi;
         }
 
         public override Expression Visit(Expression node)

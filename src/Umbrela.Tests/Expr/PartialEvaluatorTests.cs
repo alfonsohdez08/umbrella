@@ -9,9 +9,9 @@ using Xunit;
 
 namespace Umbrella.Tests.Expr
 {
-    public class ProjectorLocalEvaluatorTests
+    public class PartialEvaluatorTests
     {
-        private LocalEvaluator _localEvaluator = new LocalEvaluator();
+        private PartialEvaluator _partialEvaluator = new PartialEvaluator();
 
         //[TestInitialize]
         //public void Init()
@@ -26,7 +26,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { PersonId = p.Id, Taxes = new TaxService().GetTaxes(p.Id)};
 
             // Act
-            var projectorEvaluated = (LambdaExpression)_localEvaluator.Evaluate(projector);
+            var projectorEvaluated = (LambdaExpression)_partialEvaluator.Evaluate(projector);
 
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
@@ -40,7 +40,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { PersonId = p.Id, TaxCounselor = TaxService.GetClosestTaxCounselor() };
             
             // Act
-            var projectorEvaluated = (LambdaExpression)_localEvaluator.Evaluate(projector);
+            var projectorEvaluated = (LambdaExpression)_partialEvaluator.Evaluate(projector);
 
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
@@ -55,7 +55,7 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { p.Id, CanGetIncomingTax = new TaxService().IsIncomingTaxSeason() ? true : false};
 
             // Act
-            var projectorEvaluated = (LambdaExpression)_localEvaluator.Evaluate(projector);
+            var projectorEvaluated = (LambdaExpression)_partialEvaluator.Evaluate(projector);
 
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
@@ -71,7 +71,23 @@ namespace Umbrella.Tests.Expr
             Expression<Func<Person, dynamic>> projector = p => new { p.Id, CanGetIncomingTax = TaxService.IsTaxAvailable(p.Id) ? true : false };
 
             // Act
-            var projectorEvaluated = (LambdaExpression)_localEvaluator.Evaluate(projector);
+            var projectorEvaluated = (LambdaExpression)_partialEvaluator.Evaluate(projector);
+
+            // Assert
+            Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
+
+            Assert.True(newExpArgs[1] is ConditionalExpression);
+        }
+
+        [Fact]
+        public void Test()
+        {
+            // Arrange
+            //Expression<Func<Person, dynamic>> projector = p => new Person(){Id = (int)(new TaxService().GetTaxes(p.Id))};
+            Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id};
+
+            // Act
+            var projectorEvaluated = (LambdaExpression)_partialEvaluator.Evaluate(projector);
 
             // Assert
             Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();

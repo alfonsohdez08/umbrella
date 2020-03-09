@@ -104,7 +104,7 @@ namespace Umbrella.Tests.Expr
         [Fact(DisplayName = "When projection is a member access, it should mark the member access as a column within the projection.")]
         public void Map_PassAMemberAccessAsProjection_ShouldMapToColumnExpression()
         {
-            Expression<Func<Person, dynamic>> projector = p => p.Id;
+            Expression<Func<Person, int>> projector = p => p.Id;
 
             Expression projectorMapped = _columnExpressionMapper.Map(projector);
 
@@ -113,6 +113,21 @@ namespace Umbrella.Tests.Expr
             List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
 
             Assert.True(memberExpression == columnExpressions[0].ColumnDefinition);
+        }
+
+        public void Map()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { Id = (long)p.Id };
+
+            // can i create an anonymous type by creating an expression tree?
+            // i have to use emit from system.reflection
+            ParameterExpression param = Expression.Parameter(typeof(Person), "p");
+            // p => new {Id = new Service(p.Id){ConnString = ""}, Name = p.Name}
+
+            // for this kind of projeciton p => p.Id .... check how many member accesses are...
+            // p => p.Id + 2 ... this is invalid! i cannot infer the column's name property
+
+            // what would happen when casting?
         }
     }
 }

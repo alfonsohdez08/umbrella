@@ -36,8 +36,8 @@ namespace Umbrella
             var implicitProjectionRewritter = new ImplicitProjectionRewritter();
             projector = (LambdaExpression)implicitProjectionRewritter.Rewrite(projector);
 
-            var localEvaluator = new LocalEvaluator();
-            projector = (LambdaExpression)localEvaluator.Evaluate(projector);
+            var partialEvaluator = new PartialEvaluator();
+            projector = (LambdaExpression)partialEvaluator.Evaluate(projector);
 
             var columnSettingsEvaluator = new ColumnSettingsEvaluator();
             projector = (LambdaExpression)columnSettingsEvaluator.Evaluate(projector);
@@ -100,15 +100,6 @@ namespace Umbrella
 
                 _memberInScope = null;
             }
-            //else
-            //{
-            //    var m = c.ColumnDefinition as MemberExpression;
-            //    if (m == null)
-            //        throw new NotSupportedException($"Can not understand this projector's part: {c.ColumnDefinition.ToString()}");
-
-            //    columnName = m.Member.Name;
-            //    columnDataType = ((PropertyInfo)m.Member).PropertyType;
-            //}
 
             Type nullableType = Nullable.GetUnderlyingType(columnDataType);
             if (nullableType != null)
