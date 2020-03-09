@@ -10,7 +10,7 @@ namespace Umbrella.Expr.Rewritters
 {
     internal class MemberAccessProjectionRewritter : ExpressionRewritter
     {
-        private Stack<MemberExpression> _accesses = new Stack<MemberExpression>();
+        private Stack<MemberExpression> _members = new Stack<MemberExpression>();
 
         public override Expression Rewrite(Expression expression)
         {
@@ -25,9 +25,9 @@ namespace Umbrella.Expr.Rewritters
             Visit(lambda.Body);
 
             Expression projection = null;
-            if (_accesses.Count == 1)
+            if (_members.Count == 1)
             {
-                MemberExpression memberExp = _accesses.Pop();
+                MemberExpression memberExp = _members.Pop();
 
                 var properties = new Dictionary<string, Type>();
                 properties.Add(memberExp.Member.Name, lambda.Body.Type);
@@ -36,14 +36,9 @@ namespace Umbrella.Expr.Rewritters
                 Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
 
                 projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] {anonymousType.GetProperties()[0]});
-
-                //Type anonymousType = AnonymousType.CreateAnonymousType(properties);
-                //Type[] types = anonymousType.GetMembers().Select(m => m.GetType()).ToArray();
-
-                //projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] { memberExp.Member });
-            } else if (_accesses.Count > 1)
+            } else if (_members.Count > 1)
             {
-                throw new InvalidProjectionException("Can not rewrite a compound member acesses expression to a complete projection.", lambda.Body);
+                throw new InvalidProjectionException("There are multiple members across the projection. Ensure you project a single member, otherwise wrap it using a new operator.", lambda.Body);
             }
 
             return Expression.Lambda(projection, lambda.Parameters);
@@ -54,7 +49,7 @@ namespace Umbrella.Expr.Rewritters
             // A member accessing chain is allowed: (Customer c) => c.Address.Name
 
             // Only visits the top node of a member accessing
-            _accesses.Push(m);
+            _members.Push(m);
 
             return m;
         }
@@ -62,6 +57,10 @@ namespace Umbrella.Expr.Rewritters
         private class ProjectionVisitor: ExpressionVisitor
         {
             private NewExpression _newExp = null;
+            
+            /// <summary>
+            /// Denotes whether the projection is an explicit object instantiation or not.
+            /// </summary>
             public bool IsProjectingAnComplexType => _newExp != null;
 
             protected override Expression VisitNew(NewExpression n)
