@@ -8,7 +8,6 @@ namespace Umbrella.Extensions
 {
     internal static class TypeExtension
     {
-
         /// <summary>
         /// Determines whether a type is an anonymous one or not.
         /// </summary>
@@ -44,6 +43,5 @@ namespace Umbrella.Extensions
         {
             return type.IsValueType && !type.IsPrimitive && (type != typeof(DateTime));
         }
-
     }
 }
