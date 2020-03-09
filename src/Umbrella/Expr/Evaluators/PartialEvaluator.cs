@@ -48,7 +48,7 @@ namespace Umbrella.Expr.Evaluators
             {
                 return Eval(mi);
             }
-            else if (_nominees.Contains(mi.NewExpression) && !_nominees.Contains(mi))
+            else if (_nominees.Contains(mi.NewExpression))
             {
                 // Evaluates partially the MemberInitExpression subtree (it checks for the constructor call arguments and
                 // the member bindings)
