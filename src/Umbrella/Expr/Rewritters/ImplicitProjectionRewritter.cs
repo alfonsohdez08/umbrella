@@ -54,7 +54,7 @@ namespace Umbrella.Expr.Rewritters
                 return mi;
             }
 
-            throw new InvalidOperationException("The implicit projection should reflect an object, not a primitive.");
+            throw new InvalidOperationException("The implicit projection should reflect a reference type, not a primitive.");
         }
 
         public override Expression Rewrite(Expression expression)

@@ -10,7 +10,7 @@ namespace Umbrella.Expr.Rewritters
 {
     internal class SingleProjectionRewritter : ExpressionRewritter
     {
-        private Stack<Expression> _expressions = new Stack<Expression>();
+        private List<Expression> _expressions;
 
         public override Expression Rewrite(Expression expression)
         {
@@ -22,43 +22,52 @@ namespace Umbrella.Expr.Rewritters
             if (projectionVisitor.IsProjectingAnComplexType)
                 return expression;
 
-            Visit(lambda.Body);
-
             Expression projection = null;
-            if (_expressions.Count == 1)
+            _expressions = new List<Expression>();
+
+            try
             {
-                Expression singleExpression = _expressions.Pop();
-                string propertyName = string.Empty;
-                Type propertyType = lambda.Body.Type;
 
-                if (singleExpression.NodeType == ExpressionType.MemberAccess)
+                Visit(lambda.Body);
+
+                if (_expressions.Count == 1)
                 {
-                    MemberExpression memberExp = (MemberExpression)singleExpression;
-                    
-                    propertyName = memberExp.Member.Name;
-                    //propertyType = lambda.Body.Type;
+                    Expression singleExpression = _expressions[0];
+                    string propertyName = string.Empty;
+                    Type propertyType = lambda.Body.Type;
+
+                    if (singleExpression.NodeType == ExpressionType.MemberAccess)
+                    {
+                        MemberExpression memberExp = (MemberExpression)singleExpression;
+
+                        propertyName = memberExp.Member.Name;
+                    }
+                    else
+                    {
+                        var columnSettings = (ColumnSettings)((ConstantExpression)singleExpression).Value;
+
+                        propertyName = columnSettings.ColumnName;
+                        if (string.IsNullOrEmpty(propertyName))
+                            throw new InvalidOperationException($"The {typeof(ColumnSettings).Name} does not have a name. Ensure you specify it.");
+                    }
+
+                    var properties = new Dictionary<string, Type>();
+                    properties.Add(propertyName, propertyType);
+
+                    Type anonymousType = AnonymousType.Create(properties);
+                    //Type anonymousType = AnonymousTypeUtils.CreateType(properties);
+                    Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
+
+                    projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] { lambda.Body }, new MemberInfo[] { anonymousType.GetProperties()[0] });
                 }
-                else
+                else if (_expressions.Count > 1)
                 {
-                    var columnSettings = (ColumnSettings)((ConstantExpression)singleExpression).Value;
-
-                    propertyName = columnSettings.ColumnName;
-                    if (string.IsNullOrEmpty(propertyName))
-                        throw new InvalidOperationException($"The {typeof(ColumnSettings).Name} does not have a name. Ensure you specify it.");
-
-                    //propertyType = typeof(ColumnSettings);
+                    throw new InvalidProjectionException("There are multiple members across the projection. Ensure you project a single member, otherwise wrap it using a new operator.", lambda.Body);
                 }
-
-                var properties = new Dictionary<string, Type>();
-                properties.Add(propertyName, propertyType);
-
-                Type anonymousType = AnonymousTypeUtils.CreateType(properties);
-                Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
-
-                projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] {lambda.Body}, new MemberInfo[] {anonymousType.GetProperties()[0]});
-            } else if (_expressions.Count > 1)
+            }
+            finally
             {
-                throw new InvalidProjectionException("There are multiple members across the projection. Ensure you project a single member, otherwise wrap it using a new operator.", lambda.Body);
+                _expressions = null;
             }
 
             return Expression.Lambda(projection, lambda.Parameters);
@@ -67,7 +76,7 @@ namespace Umbrella.Expr.Rewritters
         protected override Expression VisitConstant(ConstantExpression c)
         {
             if (c.Type == typeof(ColumnSettings))
-                _expressions.Push(c);
+                _expressions.Add(c);
 
             return c;
         }
@@ -77,7 +86,7 @@ namespace Umbrella.Expr.Rewritters
             // A member accessing chain is allowed: (Customer c) => c.Address.Name
 
             // Only visits the top node of a member accessing
-            _expressions.Push(m);
+            _expressions.Add(m);
 
             return m;
         }
@@ -87,7 +96,7 @@ namespace Umbrella.Expr.Rewritters
             private NewExpression _newExp = null;
             
             /// <summary>
-            /// Denotes whether the projection is an explicit object instantiation or not.
+            /// Denotes whether the projection is a complex type or not. A complex type is basically a structure that has members.
             /// </summary>
             public bool IsProjectingAnComplexType => _newExp != null;
 

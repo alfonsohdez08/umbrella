@@ -19,7 +19,7 @@ namespace Umbrella.Expr.Projection
                 Visit(expression);
 
                 if (_newExpInScope == null)
-                    throw new InvalidProjectionException("The projection does not denote an object creation/instantiation.", expression);
+                    throw new InvalidProjectionException("The projection does not denote an object construction.", expression);
             }
             finally
             {
