@@ -45,6 +45,22 @@ namespace Umbrella.Tests.Datatable
             //Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
         }
 
+        [Fact]
+        public void Test()
+        {
+            var dictionary = new Dictionary<string, Type>()
+            {
+                {"Id", typeof(long)},
+                {"Name", typeof(string)}
+            };
+
+            var type = AnonymousType.Create(dictionary);
+
+            var obj = Activator.CreateInstance(type, new object[] {1, "Hey" });
+
+            Assert.True(type != null);
+        }
+
         //[TestMethod]
         //public void ToDataTable_ProjectToAnAnonymousTypeThatHasAColumnCustomized_ShouldGenerateTheCustomizedDtColumnAccordingToTheProjection()
         //{
