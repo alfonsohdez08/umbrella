@@ -51,6 +51,9 @@ namespace Umbrella.Expr.Rewritters
                             throw new InvalidOperationException($"The {typeof(ColumnSettings).Name} does not have a name. Ensure you specify it.");
                     }
 
+                    // TODO: im planning to downgrade to netstandard 2, so this library would be compaatiable with net framework
+                    // i might rewrite this a columnsettings
+
                     var properties = new Dictionary<string, Type>();
                     properties.Add(propertyName, propertyType);
 
