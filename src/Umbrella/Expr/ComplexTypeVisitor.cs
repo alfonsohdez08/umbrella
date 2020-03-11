@@ -15,7 +15,7 @@ namespace Umbrella.Expr
         {
             _newExp = n;
 
-            return base.VisitNew(n);
+            return n;
         }
     }
 
