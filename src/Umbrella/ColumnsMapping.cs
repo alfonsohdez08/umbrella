@@ -115,6 +115,9 @@ namespace Umbrella
                 columnDataType = columnSettings.ColumnDataType;
             }
 
+            if (string.IsNullOrEmpty(columnName))
+                throw new InvalidOperationException("Can't find/infer the column's name. Review your projection and ensure you either implicit or explicitily you set the column's name.");
+
             Type nullableType = Nullable.GetUnderlyingType(columnDataType);
             if (nullableType != null)
             {
