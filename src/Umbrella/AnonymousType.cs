@@ -52,7 +52,7 @@ namespace Umbrella
                 );
 
                 var propertiesDefinition = propertyNames.Zip(typeParameterBuilders, (property, typeParameter) => (property, typeParameter));
-                
+
                 DefineProperties(propertiesDefinition.ToList(), out var fields);
 
                 var constructorDefinition = propertyNames.Zip(fields, (property, fieldBuilder) => (property, fieldBuilder));
@@ -75,11 +75,11 @@ namespace Umbrella
                 CallingConventions.HasThis,
                 fields.Select(f => f.Item2.FieldType).ToArray()
             );
-            
+
             for (int index = 0; index < fields.Count; index++)
             {
                 constructorBuilder.DefineParameter(
-                    index + 1, 
+                    index + 1,
                     ParameterAttributes.None,
                     GenerateParameterName(fields[index].Item1)
                 );
@@ -133,7 +133,7 @@ namespace Umbrella
                 );
 
                 ILGenerator getMethodILGenerator = getMethodBuilder.GetILGenerator();
-                
+
                 getMethodILGenerator.Emit(OpCodes.Ldarg_0); // Loads "this" pointer into stack
                 getMethodILGenerator.Emit(OpCodes.Ldfld, fieldBuilder); // Uses the "this" pointer already in the stack to get the "field"
                 getMethodILGenerator.Emit(OpCodes.Ret); // Returns the value allocated in the evaluation stack (in this case, the result of the "Ldfld" operator)

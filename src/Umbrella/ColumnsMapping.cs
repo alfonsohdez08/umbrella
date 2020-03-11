@@ -98,6 +98,7 @@ namespace Umbrella
             string columnName = string.Empty;
             Type columnDataType = null;
             bool isNullable = false;
+            Expression columnDefinition = c.ColumnDefinition;
 
             if (_memberInScope != null)
             {
@@ -106,20 +107,19 @@ namespace Umbrella
 
                 _memberInScope = null;
             }
+            
+            if (columnDefinition is ConstantExpression constantExp && constantExp.Value is ColumnSettings columnSettings)
+            {
+                columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
+                columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
+                columnDataType = columnSettings.ColumnDataType;
+            }
 
             Type nullableType = Nullable.GetUnderlyingType(columnDataType);
             if (nullableType != null)
             {
                 columnDataType = nullableType;
                 isNullable = true;
-            }
-
-            Expression columnDefinition = c.ColumnDefinition;
-            if (columnDefinition is ConstantExpression constantExp && constantExp.Value is ColumnSettings columnSettings)
-            {
-                columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
-                columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
-                columnDataType = columnSettings.ColumnDataType;
             }
 
             if (!columnDataType.IsBuiltInType())

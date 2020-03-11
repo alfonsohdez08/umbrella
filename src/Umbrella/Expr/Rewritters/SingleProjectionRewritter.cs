@@ -8,7 +8,7 @@ using Umbrella.Exceptions;
 
 namespace Umbrella.Expr.Rewritters
 {
-    internal class SingleProjectionRewritter : ExpressionRewritter
+    internal partial class SingleProjectionRewritter : ExpressionRewritter
     {
         private List<Expression> _expressions;
 
@@ -16,10 +16,10 @@ namespace Umbrella.Expr.Rewritters
         {
             var lambda = (LambdaExpression)expression;
 
-            var projectionVisitor = new ProjectionVisitor();
-            projectionVisitor.Visit(lambda);
+            var complexTypeVisitor = new ComplexTypeVisitor();
+            complexTypeVisitor.Visit(lambda);
 
-            if (projectionVisitor.IsProjectingAnComplexType)
+            if (complexTypeVisitor.IsProjectingAnComplexType)
                 return expression;
 
             Expression projection = null;
@@ -32,36 +32,40 @@ namespace Umbrella.Expr.Rewritters
 
                 if (_expressions.Count == 1)
                 {
-                    Expression singleExpression = _expressions[0];
-                    string propertyName = string.Empty;
-                    Type propertyType = lambda.Body.Type;
 
-                    if (singleExpression.NodeType == ExpressionType.MemberAccess)
-                    {
-                        MemberExpression memberExp = (MemberExpression)singleExpression;
+                    MemberExpression memberExp = (MemberExpression)_expressions[0];
+                    string propertyName = memberExp.Member.Name;
 
-                        propertyName = memberExp.Member.Name;
-                    }
-                    else
-                    {
-                        var columnSettings = (ColumnSettings)((ConstantExpression)singleExpression).Value;
+                    var columnSettings = ((ColumnSettings)typeof(ColumnSettings)
+                        .GetMethod("Build")
+                        .MakeGenericMethod(new Type[] { lambda.Body.Type })
+                        .Invoke(null, new object[] { Expression.Lambda(lambda.Body) }))
+                        .Name(propertyName);
 
-                        propertyName = columnSettings.ColumnName;
-                        if (string.IsNullOrEmpty(propertyName))
-                            throw new InvalidOperationException($"The {typeof(ColumnSettings).Name} does not have a name. Ensure you specify it.");
-                    }
+                    projection = Expression.Constant(columnSettings, typeof(ColumnSettings));
+                    //else
+                    //{
+                    //    var columnSettings = (ColumnSettings)((ConstantExpression)singleExpression).Value;
+
+                    //    propertyName = columnSettings.ColumnName;
+                    //    if (string.IsNullOrEmpty(propertyName))
+                    //        throw new InvalidOperationException($"The {typeof(ColumnSettings).Name} does not have a name. Ensure you specify it.");
+
+                    //    projection = lambda.Body;
+                    //}
 
                     // TODO: im planning to downgrade to netstandard 2, so this library would be compaatiable with net framework
                     // i might rewrite this a columnsettings
 
-                    var properties = new Dictionary<string, Type>();
-                    properties.Add(propertyName, propertyType);
+                    //var properties = new Dictionary<string, Type>();
+                    //properties.Add(propertyName, propertyType);
 
-                    Type anonymousType = AnonymousType.Create(properties);
-                    //Type anonymousType = AnonymousTypeUtils.CreateType(properties);
-                    Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
+                    //Type anonymousType = null;
+                    ////Type anonymousType = AnonymousType.Create(properties);
+                    ////Type anonymousType = AnonymousTypeUtils.CreateType(properties);
+                    //Type[] types = anonymousType.GetProperties().Select(p => p.PropertyType).ToArray();
 
-                    projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] { lambda.Body }, new MemberInfo[] { anonymousType.GetProperties()[0] });
+                    //projection = Expression.New(anonymousType.GetConstructor(types), new Expression[] { lambda.Body }, new MemberInfo[] { anonymousType.GetProperties()[0] });
                 }
                 else if (_expressions.Count > 1)
                 {
@@ -73,16 +77,19 @@ namespace Umbrella.Expr.Rewritters
                 _expressions = null;
             }
 
+            if (projection == null)
+                return expression;
+
             return Expression.Lambda(projection, lambda.Parameters);
         }
 
-        protected override Expression VisitConstant(ConstantExpression c)
-        {
-            if (c.Type == typeof(ColumnSettings))
-                _expressions.Add(c);
+        //protected override Expression VisitConstant(ConstantExpression c)
+        //{
+        //    if (c.Type == typeof(ColumnSettings))
+        //        _expressions.Add(c);
 
-            return c;
-        }
+        //    return c;
+        //}
 
         protected override Expression VisitMember(MemberExpression m)
         {
@@ -92,23 +99,6 @@ namespace Umbrella.Expr.Rewritters
             _expressions.Add(m);
 
             return m;
-        }
-
-        private class ProjectionVisitor: ExpressionVisitor
-        {
-            private NewExpression _newExp = null;
-            
-            /// <summary>
-            /// Denotes whether the projection is a complex type or not. A complex type is basically a structure that has members.
-            /// </summary>
-            public bool IsProjectingAnComplexType => _newExp != null;
-
-            protected override Expression VisitNew(NewExpression n)
-            {
-                _newExp = n;
-
-                return base.VisitNew(n);
-            }
         }
     }
 }

@@ -54,11 +54,11 @@ namespace Umbrella.Tests.Datatable
                 {"Name", typeof(string)}
             };
 
-            var type = AnonymousType.Create(dictionary);
+            //var type = AnonymousType.Create(dictionary);
 
-            var obj = Activator.CreateInstance(type, new object[] {1, "Hey" });
+            //var obj = Activator.CreateInstance(type, new object[] {1, "Hey" });
 
-            Assert.True(type != null);
+            //Assert.True(type != null);
         }
 
         //[TestMethod]

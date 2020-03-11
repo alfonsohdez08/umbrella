@@ -16,8 +16,19 @@ namespace Umbrella.Expr.Projection
             var paramProjectionValidator = new ParameterReferencesValidator();
             paramProjectionValidator.Validate(expression);
 
-            var flatProjectionValidator = new FlatProjectionValidator();
-            flatProjectionValidator.Validate(expression);
+            var complexTypeVisitor = new ComplexTypeVisitor();
+            complexTypeVisitor.Visit(expression);
+
+            if (!complexTypeVisitor.IsProjectingAnComplexType)
+            {
+                var columnSettingsProjValidator = new ColumnSettingsProjectionValidator();
+                columnSettingsProjValidator.Validate(expression);
+            }
+            else
+            {
+                var flatProjectionValidator = new FlatProjectionValidator();
+                flatProjectionValidator.Validate(expression);
+            }
         }
     }
 }
