@@ -16,10 +16,10 @@ namespace Umbrella.Expr.Rewritters
         {
             var lambda = (LambdaExpression)expression;
 
-            var complexTypeVisitor = new ComplexTypeVisitor();
-            complexTypeVisitor.Visit(lambda);
+            var compositeTypeVisitor = new CompositeTypeVisitor();
+            compositeTypeVisitor.Visit(lambda);
 
-            if (complexTypeVisitor.IsProjectingAnComplexType)
+            if (compositeTypeVisitor.IsProjectingACompositeType)
                 return expression;
 
             Expression projection = null;

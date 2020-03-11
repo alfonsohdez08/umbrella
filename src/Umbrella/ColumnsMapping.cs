@@ -19,7 +19,7 @@ namespace Umbrella
         private List<Column> _columns = new List<Column>();
         private readonly ParameterExpression _projectorParameter;
         private readonly Expression _projection;
-        private readonly ParameterReferencesFinder _parameterFinder = new ParameterReferencesFinder();
+        private readonly ParameterSeeker _parameterSeeker = new ParameterSeeker();
 
         private MemberInfo _memberInScope;
 
@@ -82,8 +82,9 @@ namespace Umbrella
         }
 
         protected override Expression VisitNew(NewExpression ne)
-        {
-            //TODO: Check whether when arguments are provided to an user defined constructor (For raise an exception)
+        {   
+            //TODO: Check whether arguments provided correspond to an user defined constructor (an exception should be raised)
+
             for (int index = 0; index < ne.Arguments.Count; index++)
             {
                 _memberInScope = ne.Members[index];
@@ -129,9 +130,9 @@ namespace Umbrella
                 throw new InvalidColumnDataTypeException($"The data type for the column \"{columnName}\" is invalid: {columnDataType.ToString()}.");
 
             LambdaExpression le = null;
-            bool isParameterless = !_parameterFinder.Find(columnDefinition, _projectorParameter);
+            bool isMapperExpParameterless = !_parameterSeeker.Exists(columnDefinition, _projectorParameter);
 
-            if (isParameterless)
+            if (isMapperExpParameterless)
                 le = Expression.Lambda(columnDefinition);
             else
                 le = Expression.Lambda(columnDefinition, _projectorParameter);
@@ -142,7 +143,7 @@ namespace Umbrella
                 DataType = columnDataType,
                 IsNullable = isNullable,
                 Mapper = le.Compile(),
-                IsParameterless = isParameterless
+                IsMapperParameterless = isMapperExpParameterless
             };
 
             _columns.Add(column);

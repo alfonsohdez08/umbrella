@@ -12,8 +12,8 @@ namespace Umbrella.Expr.Projection
         {
             var projector = (LambdaExpression)expression;
 
-            var paramFinder = new ParameterReferencesFinder();
-            if (!paramFinder.Find(projector.Body, projector.Parameters[0]))
+            var paramSeeker = new ParameterSeeker();
+            if (!paramSeeker.Exists(projector.Body, projector.Parameters[0]))
                 throw new InvalidProjectionException("The projection does not hold any reference to the projector's parameter.", projector.Body);
         }
     }

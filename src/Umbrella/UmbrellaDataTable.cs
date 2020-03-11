@@ -64,7 +64,7 @@ namespace Umbrella
                 DataRow row = dataTable.NewRow();
                 foreach (Column c in columns)
                 {
-                    if (c.IsParameterless)
+                    if (c.IsMapperParameterless)
                         row[c.Name] = c.Mapper.DynamicInvoke();
                     else
                         row[c.Name] = c.Mapper.DynamicInvoke(data);

@@ -10,6 +10,6 @@ namespace Umbrella
         public Type DataType { get; set; }
         public bool IsNullable { get; set; }
         public Delegate Mapper { get; set; }
-        public bool IsParameterless { get; set; }
+        public bool IsMapperParameterless { get; set; }
     }
 }

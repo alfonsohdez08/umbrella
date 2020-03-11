@@ -37,7 +37,7 @@ namespace Umbrella.Expr.Evaluators
                 return node;
 
             if (_nominees.Contains(node))
-                return Eval(node);
+                return Evaluate(node);
 
             return base.Visit(node);
         }
@@ -46,7 +46,7 @@ namespace Umbrella.Expr.Evaluators
         {
             if (_nominees.Contains(mi))
             {
-                return Eval(mi);
+                return Evaluate(mi);
             }
             else if (_nominees.Contains(mi.NewExpression))
             {
@@ -64,7 +64,7 @@ namespace Umbrella.Expr.Evaluators
             return mi;
         }
 
-        private Expression Eval(Expression expression)
+        private static Expression Evaluate(Expression expression)
         {
             LambdaExpression le = Expression.Lambda(expression, null);
             Delegate del = le.Compile();

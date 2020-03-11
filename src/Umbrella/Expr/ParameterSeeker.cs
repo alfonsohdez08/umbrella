@@ -2,12 +2,12 @@
 
 namespace Umbrella.Expr
 {
-    public class ParameterReferencesFinder: ExpressionVisitor
+    public class ParameterSeeker: ExpressionVisitor
     {
         private ParameterExpression _parameter;
         private bool _foundParameter = false;
 
-        public bool Find(Expression expression, ParameterExpression parameter)
+        public bool Exists(Expression expression, ParameterExpression parameter)
         {
             bool foundParameter = false;
 

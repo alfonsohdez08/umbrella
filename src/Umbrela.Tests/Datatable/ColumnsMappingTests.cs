@@ -6,6 +6,7 @@ using System.Text;
 using Umbrella.Tests;
 using Umbrella.Tests.Mocks;
 using Xunit;
+using System.Linq;
 
 namespace Umbrella.Tests.Datatable
 {
@@ -13,43 +14,67 @@ namespace Umbrella.Tests.Datatable
     {
 
         [Fact(DisplayName = "When projects to an anonymous type, it should generate columns based on the properties projected.")]
-        public void ToDataTable_ProjectToAnonymousType_ShouldGenerateDataTableColumnsBasedOnTheProjectionProperties()
+        public void GetColumns_ProjectToAnonymousType_ShouldGenerateDataTableColumnsBasedOnTheProjectionProperties()
         {
             Expression<Func<Person, dynamic>> projector = p => new { ID = p.Id, p.FirstName, p.LastName, DOB = p.DateOfBirth };
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.True(columns.HasAllColumns("ID", "FirstName", "LastName", "DOB"));
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "ID", DataType = typeof(Person).GetProperty("Id").PropertyType, IsNullable = false},
+                new Column(){Name = "FirstName", DataType = typeof(Person).GetProperty("FirstName").PropertyType, IsNullable = false},
+                new Column(){Name = "LastName", DataType = typeof(Person).GetProperty("LastName").PropertyType, IsNullable = false},
+                new Column(){Name = "DOB", DataType = typeof(Person).GetProperty("DateOfBirth").PropertyType, IsNullable = false}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
         [Fact(DisplayName = "When projects to an user defined type, it should generate columns based on the members initialized.")]
-        public void ToDataTable_ProjectToUserDefinedType_ShouldGenerateDataTableColumnsWhereItsColumnsArePropertiesInitialized()
+        public void GetColumns_ProjectToUserDefinedType_ShouldGenerateDataTableColumnsWhereItsColumnsArePropertiesInitialized()
         {
             Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id, IsAlive = p.IsAlive };
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.True(columns.HasAllColumns("Id", "IsAlive"));
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "Id", DataType = typeof(Person).GetProperty("Id").PropertyType, IsNullable = false},
+                new Column(){Name = "IsAlive", DataType = typeof(Person).GetProperty("IsAlive").PropertyType, IsNullable = false}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
-        [Fact(DisplayName = "When it's an implicit projection of an user defined type, it should generate columns based on the writable properties.")]
-        public void ToDataTable_ProjectToParameter_ShouldImplicitilyGenerateADataTableColumnsBasedOnParameterTypeProperties()
+        [Fact(DisplayName = "When it's an implicit projection of an user defined type, it should generate columns based on the built-in type and writable properties.")]
+        public void GetColumns_ProjectToParameter_ShouldImplicitilyGenerateADataTableColumnsBasedOnParameterTypeProperties()
         {
             Expression<Func<Person, dynamic>> projector = p => p;
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "Id", DataType = typeof(Person).GetProperty("Id").PropertyType, IsNullable = false},
+                new Column(){Name = "FirstName", DataType = typeof(Person).GetProperty("FirstName").PropertyType, IsNullable = false},
+                new Column(){Name = "LastName", DataType = typeof(Person).GetProperty("LastName").PropertyType, IsNullable = false},
+                new Column(){Name = "DateOfBirth", DataType = typeof(Person).GetProperty("DateOfBirth").PropertyType, IsNullable = false},
+                new Column(){Name = "IsAlive", DataType = typeof(Person).GetProperty("IsAlive").PropertyType, IsNullable = false}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
-        [Fact(DisplayName = "When it's an projection that has only a member access without a new operator, it should generate a column based on the member accessed.")]
+        [Fact(DisplayName = "When it's an projection that only has a member access without a new operator, it should generate a column based on the member accessed.")]
         public void GetColumns_ProjectToAMemberAccess_ShouldGenerateColumnBasedOnTheMemberAccessed()
         {
             Expression<Func<Person, dynamic>> projector = p => p.FirstName;
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.True(columns.HasAllColumns("FirstName"));
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "FirstName", DataType = typeof(Person).GetProperty("FirstName").PropertyType, IsNullable = false}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
         [Fact(DisplayName = "When it's an projection that has a column settings in it (without a new operator), it should generate a column based on the settings passed within the projection.")]
@@ -59,7 +84,29 @@ namespace Umbrella.Tests.Datatable
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
-            Assert.True(columns.HasAllColumns("Full Name"));
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "Full Name", DataType = typeof(string), IsNullable = false}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
+        private static bool AreColumnsSetEquals(List<Column> columnsUnderTest, List<Column> expectedColumns)
+        {
+            foreach (var columnTest in columnsUnderTest.Zip(expectedColumns, (columnUnderTest, expectedColumn) => (columnUnderTest, expectedColumn)))
+            {
+                if (!AreColumnEquals(columnTest.columnUnderTest, columnTest.expectedColumn))
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static bool AreColumnEquals(Column firstColumn, Column secondColumn)
+        {
+            return firstColumn.Name == secondColumn.Name && 
+                firstColumn.DataType == secondColumn.DataType && 
+                firstColumn.IsNullable == secondColumn.IsNullable;
         }
     }
 }

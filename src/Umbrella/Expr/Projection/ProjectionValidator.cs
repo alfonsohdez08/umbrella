@@ -16,10 +16,10 @@ namespace Umbrella.Expr.Projection
             var paramProjectionValidator = new ParameterReferencesValidator();
             paramProjectionValidator.Validate(expression);
 
-            var complexTypeVisitor = new ComplexTypeVisitor();
-            complexTypeVisitor.Visit(expression);
+            var compositeTypeVisitor = new CompositeTypeVisitor();
+            compositeTypeVisitor.Visit(expression);
 
-            if (!complexTypeVisitor.IsProjectingAnComplexType)
+            if (!compositeTypeVisitor.IsProjectingACompositeType)
             {
                 var columnSettingsProjValidator = new ColumnSettingsProjectionValidator();
                 columnSettingsProjValidator.Validate(expression);
