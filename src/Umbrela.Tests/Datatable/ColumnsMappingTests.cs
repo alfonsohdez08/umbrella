@@ -7,6 +7,7 @@ using Umbrella.Tests;
 using Umbrella.Tests.Mocks;
 using Xunit;
 using System.Linq;
+using Umbrella.Exceptions;
 
 namespace Umbrella.Tests.Datatable
 {
@@ -87,6 +88,46 @@ namespace Umbrella.Tests.Datatable
             var expectedColumns = new List<Column>()
             {
                 new Column(){Name = "Full Name", DataType = typeof(string), IsNullable = false}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
+        [Fact(DisplayName = "When it's an projection of an anomyous type where one of the properties is nullable, it should generate all columns based on the projection and consider the nullable property when mapping to a column.")]
+        public void GetColumns_ProjectToAnonymousTypeWhereAPropertyIsNullable_ShouldGenerateColumnsBasedOnTheProjection()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { Id = p.Id as int? };
+
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
+
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "Id", DataType = typeof(int), IsNullable = true}
+            };
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
+        [Fact(DisplayName = "When it's an projection that has multiple member accesses combined with an operator, it should thrown an exception due to it can infer the column's name.")]
+        public void GetColumns_ProjectDifferentMemberAccessesWithoutANewOperator_ShouldThrowAnInvalidProjectionException()
+        {
+            // Members accessed: FirstName and LastName
+            Expression<Func<Person, string>> projector = p => p.FirstName + " " + p.LastName;
+
+            Func<List<Column>> getColumns = () => new ColumnsMapping(projector).GetColumns();
+
+            Assert.Throws<InvalidProjectionException>(getColumns);
+        }
+
+        [Fact(DisplayName = "When the projection only has a chain of member access, it should generate a column based on the lattest member accessed.")]
+        public void GetColumns_ProjectAChainOfMemberAccess_ShouldGenerateAColumnBasedOnTheLattestMemberAccessed()
+        {
+            // Chain of member access: SSN.Id
+            Expression<Func<Person, string>> projector = p => p.SSN.Id;
+
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
+
+            var expectedColumns = new List<Column>()
+            {
+                new Column(){Name = "Id", DataType = typeof(string), IsNullable = false}
             };
             Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
