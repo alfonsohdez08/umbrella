@@ -35,40 +35,31 @@ namespace Umbrella.Tests.Datatable
         [Fact(DisplayName = "When it's an implicit projection of an user defined type, it should generate columns based on the writable properties.")]
         public void ToDataTable_ProjectToParameter_ShouldImplicitilyGenerateADataTableColumnsBasedOnParameterTypeProperties()
         {
-            //Expression<Func<Person, dynamic>> projector = p => p;
+            Expression<Func<Person, dynamic>> projector = p => p;
+
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
+
+            Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
+        }
+
+        [Fact(DisplayName = "When it's an projection that has only a member access without a new operator, it should generate a column based on the member accessed.")]
+        public void GetColumns_ProjectToAMemberAccess_ShouldGenerateColumnBasedOnTheMemberAccessed()
+        {
+            Expression<Func<Person, dynamic>> projector = p => p.FirstName;
+
+            List<Column> columns = new ColumnsMapping(projector).GetColumns();
+
+            Assert.True(columns.HasAllColumns("FirstName"));
+        }
+
+        [Fact(DisplayName = "When it's an projection that has a column settings in it (without a new operator), it should generate a column based on the settings passed within the projection.")]
+        public void GetColumns_ProjectUsingColumnSettings_ShouldGenerateColumnBasedOnSettingsPassedInTheProjection()
+        {
             Expression<Func<Person, dynamic>> projector = p => ColumnSettings.Build(() => p.FirstName + " " + p.LastName).Name("Full Name");
 
             List<Column> columns = new ColumnsMapping(projector).GetColumns();
 
             Assert.True(columns.HasAllColumns("Full Name"));
-
-            //Assert.True(columns.HasAllColumns("Id", "FirstName", "LastName", "IsAlive", "DateOfBirth"));
         }
-
-        [Fact]
-        public void Test()
-        {
-            var dictionary = new Dictionary<string, Type>()
-            {
-                {"Id", typeof(long)},
-                {"Name", typeof(string)}
-            };
-
-            //var type = AnonymousType.Create(dictionary);
-
-            //var obj = Activator.CreateInstance(type, new object[] {1, "Hey" });
-
-            //Assert.True(type != null);
-        }
-
-        //[TestMethod]
-        //public void ToDataTable_ProjectToAnAnonymousTypeThatHasAColumnCustomized_ShouldGenerateTheCustomizedDtColumnAccordingToTheProjection()
-        //{
-        //    Expression<Func<Person, dynamic>> projector = p => new {p.Id, ID = ColumnSettings.Build(() => 1).Name("ID Modified") };
-
-        //    List<Column> columns = new ColumnsMapped(projector).GetColumns();
-
-        //    Assert.IsTrue(columns.HasAllColumns("Id", "ID Modified"));
-        //}
     }
 }
