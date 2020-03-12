@@ -100,6 +100,8 @@ namespace Umbrella.Tests.Datatable
                 new DataColumn() { ColumnName = "Full Name", DataType = typeof(string), AllowDBNull = true }
                 }
             );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
         [Fact(DisplayName = "When it's an projection of an anomyous type where one of the properties is nullable, it should generate all columns based on the projection and consider the nullable property when mapping to a column.")]
@@ -114,6 +116,8 @@ namespace Umbrella.Tests.Datatable
                 new DataColumn() { ColumnName = "Id", DataType = typeof(int), AllowDBNull = true }
                 }
             );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
         [Fact(DisplayName = "When it's an projection that has multiple member accesses combined with an operator, it should thrown an exception due to it can infer the column's name.")]
@@ -125,6 +129,22 @@ namespace Umbrella.Tests.Datatable
             Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
 
             Assert.Throws<InvalidProjectionException>(toDataTable);
+        }
+
+        [Fact(DisplayName = "When projects a string member, it should generate a nullable column.")]
+        public void ToDataTable_ProjectAStringMember_ShouldGenerateANullableColumn()
+        {
+            Expression<Func<Person, string>> projector = p => p.FirstName;
+
+            DataColumnCollection columns = _people.ToDataTable(projector).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "FirstName", DataType = typeof(Person).GetProperty("FirstName").PropertyType, AllowDBNull = true }
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
         [Fact(DisplayName = "When the projection only has a chain of member access, it should generate a column based on the lattest member accessed.")]

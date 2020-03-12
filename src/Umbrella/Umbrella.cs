@@ -27,11 +27,5 @@ namespace Umbrella
             return UmbrellaDataTable<TEntity>.Build(source, projector);
         }
 
-        //public static DataTable ToDataTable<TEntity>(this IEnumerable<TEntity> source)
-        //{
-        //    ParameterExpression paramExp = Expression.Parameter(typeof(TEntity), "x");
-
-        //    return ToDataTable(source, paramExp);
-        //}
     }
 }
