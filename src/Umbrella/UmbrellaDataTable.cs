@@ -19,32 +19,6 @@ namespace Umbrella
         private readonly LambdaExpression _projector;
         private readonly IEnumerable<T> _source;
 
-        /// <summary>
-        /// Maps to the nullable type has value method.
-        /// </summary>
-        private static readonly Dictionary<Type, Func<object, bool>> _nullables;
-
-        static UmbrellaDataTable()
-        {
-            _nullables = new Dictionary<Type, Func<object, bool>>();
-
-            _nullables.Add(typeof(bool), (val) => ((bool?)(val)).HasValue);
-            _nullables.Add(typeof(byte), (val) => ((byte?)(val)).HasValue);
-            _nullables.Add(typeof(sbyte), (val) => ((sbyte?)(val)).HasValue);
-            _nullables.Add(typeof(char), (val) => ((char?)(val)).HasValue);
-            _nullables.Add(typeof(decimal), (val) => ((decimal?)(val)).HasValue);
-            _nullables.Add(typeof(double), (val) => ((double?)(val)).HasValue);
-            _nullables.Add(typeof(float), (val) => ((float?)(val)).HasValue);
-            _nullables.Add(typeof(int), (val) => ((int?)(val)).HasValue);
-            _nullables.Add(typeof(uint), (val) => ((uint?)(val)).HasValue);
-            _nullables.Add(typeof(long), (val) => ((long?)(val)).HasValue);
-            _nullables.Add(typeof(ulong), (val) => ((ulong?)(val)).HasValue);
-            _nullables.Add(typeof(short), (val) => ((short?)(val)).HasValue);
-            _nullables.Add(typeof(ushort), (val) => ((ushort?)(val)).HasValue);
-            _nullables.Add(typeof(string), (val) => string.IsNullOrEmpty((string)val));
-            _nullables.Add(typeof(DateTime), (val) => ((DateTime?)(val)).HasValue);
-        }
-
         private UmbrellaDataTable(IEnumerable<T> source, LambdaExpression projector)
         {
             if (source == null)
@@ -96,7 +70,7 @@ namespace Umbrella
                     else
                         val = c.Mapper.DynamicInvoke(data);
 
-                    if (c.IsNullable && !_nullables[c.DataType](val))
+                    if (c.IsNullable && val == null)
                         val = DBNull.Value;
 
                     row[c.Name] = val;

@@ -38,12 +38,5 @@ namespace Umbrella
 
             return this;
         }
-
-        public ColumnSettings DataType(Type dataType)
-        {
-            _columnDataType = dataType;
-
-            return this;
-        }
     }
 }

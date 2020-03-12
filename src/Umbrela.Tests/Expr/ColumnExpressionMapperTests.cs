@@ -114,20 +114,5 @@ namespace Umbrella.Tests.Expr
 
             Assert.True(memberExpression == columnExpressions[0].ColumnDefinition);
         }
-
-        public void Map()
-        {
-            Expression<Func<Person, dynamic>> projector = p => new { Id = (long)p.Id };
-
-            // can i create an anonymous type by creating an expression tree?
-            // i have to use emit from system.reflection
-            ParameterExpression param = Expression.Parameter(typeof(Person), "p");
-            // p => new {Id = new Service(p.Id){ConnString = ""}, Name = p.Name}
-
-            // for this kind of projeciton p => p.Id .... check how many member accesses are...
-            // p => p.Id + 2 ... this is invalid! i cannot infer the column's name property
-
-            // what would happen when casting?
-        }
     }
 }
