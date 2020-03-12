@@ -7,6 +7,7 @@ using System.Linq;
 using Umbrella.Tests;
 using Umbrella.Tests.Mocks;
 using Xunit;
+using Umbrella.Expr.Evaluators;
 
 namespace Umbrella.Tests.Datatable
 {
@@ -86,7 +87,7 @@ namespace Umbrella.Tests.Datatable
         }
 
         [Fact(DisplayName = "When projects a string member, it should mark it as nullable and set DBNull whenever finds a null.")]
-        public void ToDataTable_ProjectAString_ItShouldSetDBNullWheneverFindsANull()
+        public void ToDataTable_ProjectAString_ShouldSetDBNullWheneverFindsANull()
         {
             var people = _people.Select(p => new { Name = p.Id % 2 == 0 ? p.FirstName : null }).ToList();
 
@@ -101,13 +102,64 @@ namespace Umbrella.Tests.Datatable
             );
         }
 
+        [Fact(DisplayName = "When there's an instance method call that do not reference the projector's parameter within the projection, it should execute the expression with no issue.")]
+        public void ToDataTable_OneOfTheProjectedPropertiesCallsAnInstanceMethodThatDoNotReferenceTheProjectorParameter_ShouldEvaluateTheMappingExpression()
+        {
+            Expression<Func<Person, dynamic>> projector =
+                p => new { Name = p.FirstName + " " + p.LastName, IsGettingTaxes = new TaxService().IsIncomingTaxSeason() };
+            //Expression<Func<Person, dynamic>> projector =
+            //    p => new { Name = ColumnSettings.Build(() => p.FirstName + " " + p.LastName).Name("F. Name"), IsGettingTaxes = new TaxService().IsIncomingTaxSeason() };
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            Assert.True(AreDataSetEquals(
+                dataTable,
+                _people.Select(projector.Compile()).ToList(),
+                (d, p) => p.Name == (string)d["Name"] && p.IsGettingTaxes == (bool)d["IsGettingTaxes"]
+                )
+            );
+        }
+
+        [Fact(DisplayName = "When there's an instance method call that references the projector's parameter within the projection, it should execute the expression with no issue.")]
+        public void ToDataTable_OneOfTheProjectedPropertiesCallsAnInstanceMethodThatReferencesTheProjectorParameter_ShouldEvaluateTheMappingExpression()
+        {
+            Expression<Func<Person, dynamic>> projector =
+                p => new { Name = p.FirstName + " " + p.LastName, TaxAmount = new TaxService().GetTaxes(p.Id) };
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            Assert.True(AreDataSetEquals(
+                dataTable,
+                _people.Select(projector.Compile()).ToList(),
+                (d, p) => p.Name == (string)d["Name"] && p.TaxAmount == (decimal)d["TaxAmount"]
+                )
+            );
+        }
+
+        [Fact(DisplayName = "When the projection has a column settings in it, it should take out the mapper expression from the column setting and set it as column mapper expression.")]
+        public void ToDataTable_ProjectionThatHasColumnSettingsInIt_ShouldTakeTheMapperExpressionFromTheColumnSettingAndEvaluateIt()
+        {
+            // TODO: for fun, inspect this using ILSpy
+            Expression<Func<Person, dynamic>> projector =
+                p => new { Name = ColumnSettings.Build(() => p.FirstName + " " + p.LastName).Name("F. Name"), IsGettingTaxes = new TaxService().IsIncomingTaxSeason() };
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            ParameterExpression projectorParameter = projector.Parameters[0];
+            Assert.True(AreDataSetEquals(
+                dataTable,
+                _people.Select(projector.Compile()).ToList(), // when compiles the lambda expression, all the projector parameter references are closured
+                (d, p) => (string)ExecuteMapper(p.Name.Mapper) == (string)d["F. Name"] && 
+                    p.IsGettingTaxes == (bool)d["IsGettingTaxes"]
+                )
+            );
+        }
+
         private static bool AreDataSetEquals<T>(DataTable dataTable, List<T> expectedData, Func<DataRow, T, bool> areEqual)
         {
             foreach (var dataMappingTest in dataTable.Select().Zip(expectedData, (dataRow, element) => (dataRow, element)))
-            {
                 if (!areEqual(dataMappingTest.dataRow, dataMappingTest.element))
                     return false;
-            }
 
             return true;
         }
@@ -115,12 +167,62 @@ namespace Umbrella.Tests.Datatable
         private static bool AreDataSetEquals(DataTable dataTable, List<dynamic> expectedData, Func<DataRow, dynamic, bool> areEqual)
         {
             foreach (var dataMappingTest in dataTable.Select().Zip(expectedData, (dataRow, element) => (dataRow, element)))
-            {
                 if (!areEqual(dataMappingTest.dataRow, dataMappingTest.element))
                     return false;
-            }
 
             return true;
         }
+
+        private static object ExecuteMapper(Expression mapper)
+        {
+            var mapperLambdaExp = (LambdaExpression)mapper;
+            Delegate mapperDelegate = mapperLambdaExp.Compile();
+
+            return mapperDelegate.DynamicInvoke();
+        }
+
+        private class ProjectorParameterReplacer: ExpressionVisitor
+        {
+            private readonly ParameterExpression _parameter;
+            private readonly object _instance;
+            
+            private ProjectorParameterReplacer(ParameterExpression parameter, object instance)
+            {
+                _parameter = parameter;
+                _instance = instance;
+            }
+
+            public static Expression Replace(Expression mapper, ParameterExpression parameter, object instance)
+            {
+                var projectorParameterReplacer = new ProjectorParameterReplacer(parameter, instance);
+                
+                return projectorParameterReplacer.Visit(mapper);
+            }
+
+
+            protected override Expression VisitParameter(ParameterExpression p)
+            {
+                if (p == _parameter)
+                    return Expression.Constant(_instance, p.Type);
+
+                return p;
+            }
+        }
+
+        //private static LambdaExpression StripColumnSettings(LambdaExpression lambdaExp)
+        //{
+        //    var columnSettingsEvaluator = new ColumnSettingsEvaluator();
+        //    var lambdaPartiallyEval = (LambdaExpression)columnSettingsEvaluator.Evaluate(lambdaExp);
+
+
+
+        //    throw new NotImplementedException();
+        //}
+
+        //private class ProjectionVisitor: ExpressionVisitor
+        //{
+
+
+        //}
     }
 }

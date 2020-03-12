@@ -31,7 +31,9 @@ namespace Umbrella.Extensions
         /// <returns>True if it's a built-in type; otherwise false.</returns>
         public static bool IsBuiltInType(this Type type)
         {
-            return type.IsPrimitive || type == typeof(string) || type == typeof(DateTime);
+            //Primitive types in .NET: https://docs.microsoft.com/en-us/dotnet/api/system.type.isprimitive?view=netstandard-2.0
+
+            return type.IsPrimitive || type == typeof(decimal) ||  type == typeof(string) || type == typeof(DateTime);
         }
 
         /// <summary>

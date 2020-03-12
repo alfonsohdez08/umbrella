@@ -126,9 +126,9 @@ namespace Umbrella.Tests.Datatable
             // Members accessed: FirstName and LastName
             Expression<Func<Person, string>> projector = p => p.FirstName + " " + p.LastName;
 
-            Func<DataTable> toDataTable = () => _people.ToDataTable(projector);
+            Func<DataColumnCollection> getColumns = () => _people.ToDataTable(projector).Columns;
 
-            Assert.Throws<InvalidProjectionException>(toDataTable);
+            Assert.Throws<InvalidProjectionException>(getColumns);
         }
 
         [Fact(DisplayName = "When projects a string member, it should generate a nullable column.")]
@@ -160,6 +160,37 @@ namespace Umbrella.Tests.Datatable
                 new DataColumn() { ColumnName = "Id", DataType = typeof(string), AllowDBNull = true }
                 }
             );
+        }
+
+        [Fact(DisplayName = "When the projection does not have a reference to the projector's parameter, it should thrown an exception.")]
+        public void ToDataTable_ParameterlessProjection_ShouldThrowAnInvalidProjectionException()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { Foo = 1, Description = "hey" };
+
+            Func<DataColumnCollection> getColumns = () => _people.ToDataTable(projector).Columns;
+
+            Assert.Throws<InvalidProjectionException>(getColumns);
+        }
+
+        [Fact(DisplayName = "When the projector projects a constant, it should thrown an exception.")]
+        public void ToDataTable_ProjectAConstant_ShouldThrowAnInvalidProjectionException()
+        {
+            Expression<Func<Person, dynamic>> projector = p => "Hey, I am constant!";
+
+            Func<DataColumnCollection> getColumns = () => _people.ToDataTable(projector).Columns;
+
+            Assert.Throws<InvalidProjectionException>(getColumns);
+        }
+
+        [Fact(DisplayName = "When the projection has a property whose type is not a .NET built-in type, it should throw an exception.")]
+        public void ToDataTable_ProjectionHasANonBuiltInType_ShouldThrowAnInvalidColumnDataTypException()
+        {
+            var ssn = new SSN();
+            Expression<Func<Person, dynamic>> projector = p => new { p.Id, SSN = ssn };
+
+            Func<DataColumnCollection> getColumns = () => _people.ToDataTable(projector).Columns;
+
+            Assert.Throws<InvalidColumnDataTypeException>(getColumns);
         }
 
         private static bool AreColumnsSetEquals(DataColumnCollection columnsUnderTest, DataColumnCollection expectedColumns)

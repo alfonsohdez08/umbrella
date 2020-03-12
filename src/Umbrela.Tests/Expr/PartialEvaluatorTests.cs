@@ -79,20 +79,5 @@ namespace Umbrella.Tests.Expr
             Assert.True(newExpArgs[1] is ConditionalExpression);
         }
 
-        [Fact]
-        public void Test()
-        {
-            // Arrange
-            //Expression<Func<Person, dynamic>> projector = p => new Person(){Id = (int)(new TaxService().GetTaxes(p.Id))};
-            Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id};
-
-            // Act
-            var projectorEvaluated = (LambdaExpression)_partialEvaluator.Evaluate(projector);
-
-            // Assert
-            Expression[] newExpArgs = ((NewExpression)projectorEvaluated.Body).GetArguments();
-
-            Assert.True(newExpArgs[1] is ConditionalExpression);
-        }
     }
 }
