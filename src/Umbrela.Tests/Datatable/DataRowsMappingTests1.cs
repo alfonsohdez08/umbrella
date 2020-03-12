@@ -10,11 +10,11 @@ using Xunit;
 
 namespace Umbrella.Tests.Datatable
 {
-    public class DataMappingTests
+    public class DataRowsMappingTests
     {
         private readonly IEnumerable<Person> _people;
 
-        public DataMappingTests()
+        public DataRowsMappingTests()
         {
             _people = new List<Person>()
             {
