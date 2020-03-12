@@ -48,6 +48,17 @@ namespace Umbrella.Tests.Datatable
             Assert.True(ValidateRowsAreMapped(_people, dataTable, (p, r) => p.DateOfBirth == (DateTime)r["DateOfBirth"]));
         }
 
+        [Fact]
+        public void TestNullability()
+        {
+            //Expression<Func<Person, dynamic>> projector = p => new { Id = (int?)p.Id, IsAlive = (bool?)p.IsAlive };
+            Expression<Func<Person, dynamic>> projector = p => new {Name = (string?)p.FirstName, Id = (int?)p.Id, IsAlive = (bool?)p.IsAlive };
+
+            DataTable dataTable = _people.ToDataTable(projector);
+
+            Assert.True(true);
+        }
+
         //[TestMethod]
         //public void ToDataTable_PassAStaticMethodInTheProjector_ShouldRunLocallyThatMethodAndTreatItsResultAsAConstant()
         //{
