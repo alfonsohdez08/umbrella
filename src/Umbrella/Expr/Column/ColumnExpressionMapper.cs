@@ -6,15 +6,18 @@ using Umbrella.Expr.Nominators;
 
 namespace Umbrella.Expr.Column
 {
+    /// <summary>
+    /// Acts as DataTable column expression mapper.
+    /// </summary>
     internal class ColumnExpressionMapper: ExpressionVisitor
     {
         private HashSet<Expression> _nominatedColumns = new HashSet<Expression>();
 
         /// <summary>
-        /// Maps property's binding expression to a column expression.
+        /// Wraps all subtrees that can be a column by ColumnExpression instances.
         /// </summary>
         /// <param name="lambda">Projector.</param>
-        /// <returns>A projector where each property's binding expression has been replaced by a column expression.</returns>
+        /// <returns>An expression that has column expression on it (a column expression means a DataTable's column).</returns>
         public Expression Map(LambdaExpression lambda)
         {
             Expression projectionMapped = null;

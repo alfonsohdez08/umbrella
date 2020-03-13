@@ -5,8 +5,15 @@ using System.Text;
 
 namespace Umbrella.Expr.Projection
 {
-    internal class ColumnSettingsProjectionValidator : ExpressionVisitor, IExpressionValidator
+    /// <summary>
+    /// Validator for ColumnSettings name.
+    /// </summary>
+    internal class ColumnSettingsNameValidator : ExpressionVisitor, IExpressionValidator
     {
+        /// <summary>
+        /// Checks if the ColumnSettings instance has already a name for the column.
+        /// </summary>
+        /// <param name="expression">Projector.</param>
         public void Validate(Expression expression)
         {
             Visit(expression);

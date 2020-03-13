@@ -6,11 +6,18 @@ using Umbrella.Exceptions;
 
 namespace Umbrella.Expr.Projection
 {
+    /// <summary>
+    /// Validator for flat projections.
+    /// </summary>
     internal class FlatProjectionValidator : ExpressionVisitor, IExpressionValidator
     {
         private NewExpression _newExpInScope = null;
         private Expression _projection;
 
+        /// <summary>
+        /// Checks if the projection does not have nested projection (meaning nested new operators).
+        /// </summary>
+        /// <param name="expression">Projector.</param>
         public void Validate(Expression expression)
         {
             try

@@ -31,32 +31,47 @@ namespace Umbrella
             _projection = projector.Body;
         }
 
+        /// <summary>
+        /// Modify a projector for make it understandable to the columns mapping process.
+        /// </summary>
+        /// <param name="projector">Projector.</param>
+        /// <returns>A projector that can be used by the columns mapping process for discover the DataTable columns.</returns>
         private LambdaExpression ShapeProjector(LambdaExpression projector)
         {
+            // Rewrites an projection of the form p => p into a new projection
+            // that uses the new operator (explicit projection): p => new {p.UnitPrice, p.InStock}
             var implicitProjectionRewritter = new ImplicitProjectionRewritter();
             projector = (LambdaExpression)implicitProjectionRewritter.Rewrite(projector);
 
+            // Evaluates any subtree that do not reference the projector's parameter
             var partialEvaluator = new PartialEvaluator();
             projector = (LambdaExpression)partialEvaluator.Evaluate(projector);
 
+            // Evalatues any ColumnSettings object within the projection
             var columnSettingsEvaluator = new ColumnSettingsEvaluator();
             projector = (LambdaExpression)columnSettingsEvaluator.Evaluate(projector);
-
-            // Rewrites if the projection is in the form of:
-            // (Customer c) => c.Address.FirstStreet
-            // (Customer c) => ColumnSettings.Build(() => c.FirstName + " " + c.LastName).Name("Full Name")
-            var memberAccessProjRewritter = new SingleProjectionRewritter();
+            
+            // Rewrites a projection of the form p => p.Member into a new projection
+            // that wraps the member access as a ColumnSettings
+            var memberAccessProjRewritter = new SingleMemberProjectionRewritter();
             projector = (LambdaExpression)memberAccessProjRewritter.Rewrite(projector);
 
+            // Checks if the projection is valid or not (if it's invalid, an exception would be
+            // thrown to the client)
             var projectionValidator = new ProjectionValidator();
             projectionValidator.Validate(projector);
 
+            // Marks as column any subtree that's not a NewExpression
             var columnExpressionsMapper = new ColumnExpressionMapper();
             projector = (LambdaExpression)columnExpressionsMapper.Map(projector);
 
             return projector;
         }
 
+        /// <summary>
+        /// Retrieves columns discovered/inferred.
+        /// </summary>
+        /// <returns>A list of columns that represent the DataTable's columns.</returns>
         public List<Column> GetColumns()
         {
             List<Column> columns = null;
@@ -99,7 +114,7 @@ namespace Umbrella
             string columnName = string.Empty;
             Type columnDataType = null;
             bool isNullable = false;
-            Expression columnDefinition = c.ColumnDefinition;
+            Expression columnMapper = c.ColumnMapper;
 
             if (_memberInScope != null)
             {
@@ -109,9 +124,9 @@ namespace Umbrella
                 _memberInScope = null;
             }
             
-            if (columnDefinition is ConstantExpression constantExp && constantExp.Value is ColumnSettings columnSettings)
+            if (columnMapper is ConstantExpression constantExp && constantExp.Value is ColumnSettings columnSettings)
             {
-                columnDefinition = ((LambdaExpression)columnSettings.Mapper).Body;
+                columnMapper = ((LambdaExpression)columnSettings.Mapper).Body;
                 columnName = !string.IsNullOrEmpty(columnSettings.ColumnName) ? columnSettings.ColumnName : columnName;
                 columnDataType = columnSettings.ColumnDataType;
             }
@@ -137,12 +152,12 @@ namespace Umbrella
                 throw new InvalidColumnDataTypeException($"The data type for the column \"{columnName}\" is invalid: {columnDataType.ToString()}.");
 
             LambdaExpression le = null;
-            bool isMapperExpParameterless = !_parameterSeeker.Exists(columnDefinition, _projectorParameter);
+            bool isMapperExprParameterless = !_parameterSeeker.Exists(columnMapper, _projectorParameter);
 
-            if (isMapperExpParameterless)
-                le = Expression.Lambda(columnDefinition);
+            if (isMapperExprParameterless)
+                le = Expression.Lambda(columnMapper);
             else
-                le = Expression.Lambda(columnDefinition, _projectorParameter);
+                le = Expression.Lambda(columnMapper, _projectorParameter);
 
             var column = new Column()
             {
@@ -150,7 +165,7 @@ namespace Umbrella
                 DataType = columnDataType,
                 IsNullable = isNullable,
                 Mapper = le.Compile(),
-                IsMapperParameterless = isMapperExpParameterless
+                IsMapperParameterless = isMapperExprParameterless
             };
 
             _columns.Add(column);

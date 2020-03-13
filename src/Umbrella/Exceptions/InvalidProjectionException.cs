@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Umbrella.Exceptions
 {
+    /// <summary>
+    /// An exception that denotes that the projection failed one of the validation.
+    /// </summary>
     public class InvalidProjectionException: Exception
     {
         public Expression Projector { get; private set; }

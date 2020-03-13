@@ -2,11 +2,20 @@
 
 namespace Umbrella.Expr
 {
+    /// <summary>
+    /// Seeker for expression parameters.
+    /// </summary>
     public class ParameterSeeker: ExpressionVisitor
     {
         private ParameterExpression _parameter;
         private bool _foundParameter = false;
 
+        /// <summary>
+        /// Checks wheter a specific instance of a parameter exist or not within an expression.
+        /// </summary>
+        /// <param name="expression">Expression for inspection.</param>
+        /// <param name="parameter">Parameter instance that would be seeked.</param>
+        /// <returns>True if found; otherwise false.</returns>
         public bool Exists(Expression expression, ParameterExpression parameter)
         {
             bool foundParameter = false;

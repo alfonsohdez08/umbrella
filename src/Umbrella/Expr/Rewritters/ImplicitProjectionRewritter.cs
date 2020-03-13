@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using Umbrella.Extensions;
 
 namespace Umbrella.Expr.Rewritters
 {
     /// <summary>
-    /// Rewrittes a projector that has as body a ParameterExpression.
+    /// Rewritter for implicit projections.
     /// </summary>
     internal class ImplicitProjectionRewritter : ExpressionRewritter
     {
@@ -54,9 +53,14 @@ namespace Umbrella.Expr.Rewritters
                 return mi;
             }
 
-            throw new InvalidOperationException("The implicit projection should reflect a reference type, not a primitive.");
+            throw new InvalidOperationException("The implicit projection should reflect a composite type, not a primitive/simple.");
         }
 
+        /// <summary>
+        /// Rewrittes an implicit projection (a projector that projects simply its parameter) into an explicit one (one that uses the new operator).
+        /// </summary>
+        /// <param name="expression">Whole projector.</param>
+        /// <returns>A new projector if it was an implicit projection; otherwise the same projector.</returns>
         public override Expression Rewrite(Expression expression)
         {
             var projector = (LambdaExpression)expression;

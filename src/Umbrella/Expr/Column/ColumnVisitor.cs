@@ -20,9 +20,9 @@ namespace Umbrella.Expr.Column
 
         protected virtual Expression VisitColumn(ColumnExpression c)
         {
-            Expression columnDefinition = Visit(c.ColumnDefinition);
-            if (c.ColumnDefinition != columnDefinition)
-                return new ColumnExpression(columnDefinition);
+            Expression columnMapper = Visit(c.ColumnMapper);
+            if (c.ColumnMapper != columnMapper)
+                return new ColumnExpression(columnMapper);
 
             return c;
         }

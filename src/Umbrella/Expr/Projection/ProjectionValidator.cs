@@ -8,20 +8,23 @@ namespace Umbrella.Expr.Projection
     internal class ProjectionValidator : IExpressionValidator
     {
         /// <summary>
-        /// Validates that the projection is valid. A projection is valid if it's a flat projection and references at least one time the projector's parameter.
+        /// Checks whether the projection is valid or not. A projection is valid if it's a flat projection and references at least one time the projector's parameter.
         /// </summary>
-        /// <param name="expression">The projector.</param>
+        /// <param name="expression">Projector.</param>
         public void Validate(Expression expression)
         {
+            // Checks if the lambda's expression parameter is referenced within the projection
             var paramProjectionValidator = new ParameterReferencesValidator();
             paramProjectionValidator.Validate(expression);
 
+            // Determines if the projection denotes a composite type or not
             var compositeTypeVisitor = new CompositeTypeVisitor();
             compositeTypeVisitor.Visit(expression);
 
             if (!compositeTypeVisitor.IsProjectingACompositeType)
             {
-                var columnSettingsProjValidator = new ColumnSettingsProjectionValidator();
+                // It means it's a single member projection, so it checks if the ColumnSettings has a name set
+                var columnSettingsProjValidator = new ColumnSettingsNameValidator();
                 columnSettingsProjValidator.Validate(expression);
             }
             else

@@ -26,7 +26,7 @@ namespace Umbrella.Tests.Expr
             var memberExpression = (MemberExpression)((NewExpression)projector.Body).GetExpressionByMember("Id");
             ColumnExpression columnExpressionMapped = new ColumnExpressionsFetcher().FetchAll(projectorMapped)[0];
 
-            Assert.True(columnExpressionMapped.ColumnDefinition == memberExpression);
+            Assert.True(columnExpressionMapped.ColumnMapper == memberExpression);
         }
 
         [Fact(DisplayName = "When projects to an anonymous type that has multiple properties, it should mark all the properties expression as columns within the projection.")]
@@ -45,7 +45,7 @@ namespace Umbrella.Tests.Expr
             Assert.False(newExpArgs.Length != columnExpressions.Length, $"Expected {newExpArgs.Length} columns mapped, but instead {columnExpressions.Length} columns were mapped.");
 
             for (int index = 0; index < newExpArgs.Length; index++)
-                Assert.True(newExpArgs[index] == columnExpressions[index].ColumnDefinition, $"Dismatch between expressions mapped. Expected: {newExpArgs[index]} ; Mapped: {columnExpressions[index].ColumnDefinition}");
+                Assert.True(newExpArgs[index] == columnExpressions[index].ColumnMapper, $"Dismatch between expressions mapped. Expected: {newExpArgs[index]} ; Mapped: {columnExpressions[index].ColumnMapper}");
         }
 
         [Fact(DisplayName = "When projects to an user defined type that only initialize a member, it should mark the member assignment as a column within the projection.")]
@@ -63,7 +63,7 @@ namespace Umbrella.Tests.Expr
 
             List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
 
-            Assert.True(columnExpression.ColumnDefinition == columnExpressions[0].ColumnDefinition);
+            Assert.True(columnExpression.ColumnMapper == columnExpressions[0].ColumnMapper);
         }
         
         [Fact(DisplayName = "When projects to an user defined type with multiple members initialized, it should mark the member assignments as columns within the projection.")]
@@ -82,7 +82,7 @@ namespace Umbrella.Tests.Expr
             Assert.False(bindingExpressions.Length != columnExpressions.Length, $"Expected {bindingExpressions.Length} columns mapped, but instead {columnExpressions.Length} columns were mapped.");
 
             for (int index = 0; index < bindingExpressions.Length; index++)
-                Assert.True(bindingExpressions[index] == columnExpressions[index].ColumnDefinition, $"Dismatch between expressions mapped. Expected: {bindingExpressions[index]} ; Mapped: {columnExpressions[index].ColumnDefinition}");
+                Assert.True(bindingExpressions[index] == columnExpressions[index].ColumnMapper, $"Dismatch between expressions mapped. Expected: {bindingExpressions[index]} ; Mapped: {columnExpressions[index].ColumnMapper}");
 
         }
 
@@ -112,7 +112,7 @@ namespace Umbrella.Tests.Expr
 
             List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
 
-            Assert.True(memberExpression == columnExpressions[0].ColumnDefinition);
+            Assert.True(memberExpression == columnExpressions[0].ColumnMapper);
         }
     }
 }

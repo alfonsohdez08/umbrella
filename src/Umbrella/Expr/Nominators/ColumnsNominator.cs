@@ -4,6 +4,9 @@ using Umbrella.Extensions;
 
 namespace Umbrella.Expr.Nominators
 {
+    /// <summary>
+    /// DataTable's columns nominator.
+    /// </summary>
     internal class ColumnsNominator : Nominator
     {
         private HashSet<Expression> _nominees = new HashSet<Expression>();
@@ -32,6 +35,11 @@ namespace Umbrella.Expr.Nominators
             return node;
         }
 
+        /// <summary>
+        /// Nominates all the subtrees that do not denote a type instantiation (meaning, no NewExpressions) as columns for the DataTable.
+        /// </summary>
+        /// <param name="expression">Projection.</param>
+        /// <returns>A set of nodes that potentially represent the DataTable's columns.</returns>
         public override HashSet<Expression> Nominate(Expression expression)
         {
             _nominees = new HashSet<Expression>();

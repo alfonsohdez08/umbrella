@@ -3,12 +3,21 @@ using System.Linq.Expressions;
 
 namespace Umbrella.Expr.Nominators
 {
+    /// <summary>
+    /// Subtrees nominator.
+    /// </summary>
     internal class PartialEvalNominator : Nominator
     {
         private ParameterExpression _parameter;
         private HashSet<Expression> _nominees;
         private bool _isEvaluableLocally = true;
 
+        /// <summary>
+        /// Nominates subtrees that do not reference an specific parameter (it's usually used for a LambdaExpression parameter).
+        /// </summary>
+        /// <param name="expression">Expression tree (lambda expression).</param>
+        /// <returns>A set of potential nodes that can be evaluated.</returns>
+        /// <remarks>It nominates top-bottom nodes, so the set would contain all the nodes of a subtree.</remarks>
         public override HashSet<Expression> Nominate(Expression expression)
         {
             LambdaExpression lambda = (LambdaExpression)expression;

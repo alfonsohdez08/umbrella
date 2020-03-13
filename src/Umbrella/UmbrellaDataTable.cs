@@ -14,11 +14,27 @@ using Umbrella.Expr.Column;
 
 namespace Umbrella
 {
+    /// <summary>
+    /// Wrapper around the System.Data.DataTable.
+    /// </summary>
+    /// <typeparam name="T">The type of the input dataset.</typeparam>
     internal class UmbrellaDataTable<T>
     {
+        /// <summary>
+        /// Holds the projection of a structure that's inspected in order to infer/get the columns along with its mapping of the DataTable.
+        /// </summary>
         private readonly LambdaExpression _projector;
+
+        /// <summary>
+        /// The dataset that would be dumped into the DataTable.
+        /// </summary>
         private readonly IEnumerable<T> _source;
 
+        /// <summary>
+        /// Creates an instance of an <c>UmbrellaDataTable</c>.
+        /// </summary>
+        /// <param name="source">Input dataset.</param>
+        /// <param name="projector">Columns projector.</param>
         private UmbrellaDataTable(IEnumerable<T> source, LambdaExpression projector)
         {
             if (source == null)
@@ -32,12 +48,12 @@ namespace Umbrella
         }
 
         /// <summary>
-        /// Constructs a DataTable with the <paramref name="source"/>'s data and the columns encountered in the <paramref name="projector"/>.
+        /// Builds a DataTable based on a projection.
         /// </summary>
-        /// <typeparam name="TEntity">Type that contains the collection.</typeparam>
-        /// <param name="source">Source collection.</param>
-        /// <param name="projector">Columns projector.</param>
-        /// <returns>A filled DataTable.</returns>
+        /// <typeparam name="TEntity">Type that holds the set (the type parameter of an IEnumerable<>).</typeparam>
+        /// <param name="source">Dataset.</param>
+        /// <param name="projector">Projects a structure that defines the columns of the DataTable and how the data would be mapped into it (mapping expressions).</param>
+        /// <returns>A filled DataTable where its columns were inferred/discovered by the projection.</returns>
         public static DataTable Build<TEntity>(IEnumerable<TEntity> source, Expression projector)
         {
             var umbrellaDataTable = new UmbrellaDataTable<TEntity>(source, (LambdaExpression)projector);

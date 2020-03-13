@@ -6,6 +6,9 @@ using Umbrella.Extensions;
 
 namespace Umbrella.Expr.Evaluators
 {
+    /// <summary>
+    /// ColumnSettings evaluator.
+    /// </summary>
     internal class ColumnSettingsEvaluator: Evaluator
     {
         protected override Expression VisitMethodCall(MethodCallExpression mc)
@@ -32,6 +35,11 @@ namespace Umbrella.Expr.Evaluators
             return base.VisitMethodCall(mc);
         }
 
+        /// <summary>
+        /// Evaluates all nodes that represent a call to a ColumnSettings method.
+        /// </summary>
+        /// <param name="expression">Expression that might have or not ColumnSettings method calls in it.</param>
+        /// <returns>A modified expression if found any ColumnSettings method call; otherwise the same expression.</returns>
         public override Expression Evaluate(LambdaExpression expression)
         {
             Expression body = Visit(expression.Body);

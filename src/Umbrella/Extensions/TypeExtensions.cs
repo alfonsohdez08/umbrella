@@ -25,7 +25,7 @@ namespace Umbrella.Extensions
         }
 
         /// <summary>
-        /// Determines whether a given type is a built-in type from .NET framework.
+        /// Determines whether a given type is a built-in type from .NET framework or not.
         /// </summary>
         /// <param name="type">Type.</param>
         /// <returns>True if it's a built-in type; otherwise false.</returns>

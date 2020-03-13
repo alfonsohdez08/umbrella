@@ -6,8 +6,15 @@ using Umbrella.Exceptions;
 
 namespace Umbrella.Expr.Projection
 {
+    /// <summary>
+    /// Validator for parameter references.
+    /// </summary>
     internal class ParameterReferencesValidator : ExpressionVisitor, IExpressionValidator
     {
+        /// <summary>
+        /// Checks whether the projection references the projector's parameter.
+        /// </summary>
+        /// <param name="expression">Projector.</param>
         public void Validate(Expression expression)
         {
             var projector = (LambdaExpression)expression;
