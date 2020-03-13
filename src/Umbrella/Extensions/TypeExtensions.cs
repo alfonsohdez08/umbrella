@@ -32,8 +32,11 @@ namespace Umbrella.Extensions
         public static bool IsBuiltInType(this Type type)
         {
             //Primitive types in .NET: https://docs.microsoft.com/en-us/dotnet/api/system.type.isprimitive?view=netstandard-2.0
+            Type typeUnderTest = type;
+            if (Nullable.GetUnderlyingType(typeUnderTest) != null)
+                typeUnderTest = Nullable.GetUnderlyingType(typeUnderTest);
 
-            return type.IsPrimitive || type == typeof(decimal) ||  type == typeof(string) || type == typeof(DateTime);
+            return typeUnderTest.IsPrimitive || typeUnderTest == typeof(decimal) || typeUnderTest == typeof(string) || typeUnderTest == typeof(DateTime);
         }
 
         /// <summary>

@@ -160,6 +160,8 @@ namespace Umbrella.Tests.Datatable
                 new DataColumn() { ColumnName = "Id", DataType = typeof(string), AllowDBNull = true }
                 }
             );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
         [Fact(DisplayName = "When the projection does not have a reference to the projector's parameter, it should thrown an exception.")]
@@ -193,6 +195,29 @@ namespace Umbrella.Tests.Datatable
             Assert.Throws<InvalidColumnDataTypeException>(getColumns);
         }
 
+        [Fact(DisplayName = "When it's an implicit projection where a couple of properties are nullable, it should generate nullable columns.")]
+        public void ToDataTable_ImplicitProjectionThatHasNullableProperties_ShouldGenerateNullableColumns()
+        {
+            var places = new List<Place>()
+            {
+                new Place(){PlaceId = 1, AverageIncoming = 10m, IsExpensiveArea = false },
+                new Place(){PlaceId = 5, AverageIncoming = null, IsExpensiveArea = false },
+                new Place(){PlaceId = null, AverageIncoming = 2000m, IsExpensiveArea = true },
+            };
+            Expression<Func<Place, Place>> projector = p => p;
+
+            DataColumnCollection columns = places.ToDataTable(projector).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "PlaceId", DataType = typeof(int), AllowDBNull = true },
+                new DataColumn() { ColumnName = "AverageIncoming", DataType = typeof(decimal), AllowDBNull = true },
+                new DataColumn() { ColumnName = "IsExpensiveArea", DataType = typeof(bool), AllowDBNull = false }
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
         private static bool AreColumnsSetEquals(DataColumnCollection columnsUnderTest, DataColumnCollection expectedColumns)
         {
             for (var index = 0; index < expectedColumns.Count; index++)
