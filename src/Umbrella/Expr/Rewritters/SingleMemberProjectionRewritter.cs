@@ -44,10 +44,14 @@ namespace Umbrella.Expr.Rewritters
                     MemberExpression memberExp = (MemberExpression)_expressions[0];
                     string propertyName = memberExp.Member.Name;
 
-                    var columnSettings = ((ColumnSettings)typeof(ColumnSettings)
-                        .GetMethod("Build")
-                        .MakeGenericMethod(new Type[] { lambda.Body.Type })
-                        .Invoke(null, new object[] { Expression.Lambda(lambda.Body) }))
+                    //var columnSettings = ((ColumnSettings)typeof(ColumnSettings)
+                    //    .GetMethod("Build")
+                    //    .MakeGenericMethod(new Type[] { lambda.Body.Type })
+                    //    .Invoke(null, new object[] { Expression.Lambda(lambda.Body) }))
+                    //    .Name(propertyName);
+
+                    var columnSettings =
+                        new ColumnSettings(Expression.Lambda(lambda.Body))
                         .Name(propertyName);
 
                     projection = Expression.Constant(columnSettings, typeof(ColumnSettings));
