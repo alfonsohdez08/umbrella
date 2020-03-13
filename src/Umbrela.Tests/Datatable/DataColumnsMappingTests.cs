@@ -218,6 +218,33 @@ namespace Umbrella.Tests.Datatable
 
             Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
+
+        [Fact(DisplayName = "When it's an implicit projection of a struct, it should generate columns based on the writable properties and whose type are built-in.")]
+        public void ToDataTable_ImplicitProjectionOfAnStruct_ShouldGenerateColumnsBasedOnTheBuiltInTypeAndWrittableProperties()
+        {
+            var cars = new List<Car>()
+            {
+                new Car(){Brand = "Toyota", Model = "Corolla", Year = 2010, IsAvailable = true, PriceInMarket = 2000m},
+                new Car(){Brand = "Toyota", Model = "Camry", Year = 2000, IsAvailable = null, PriceInMarket = 200m},
+                new Car(){Brand = "Honda", Model = "Civic", Year = 2012, IsAvailable = false, PriceInMarket = 1000m},
+            };
+            Expression<Func<Car, Car>> projector = c => c;
+
+            DataColumnCollection columns = cars.ToDataTable(projector).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "Brand", DataType = typeof(string), AllowDBNull = true },
+                new DataColumn() { ColumnName = "Model", DataType = typeof(string), AllowDBNull = true },
+                new DataColumn() { ColumnName = "Year", DataType = typeof(int), AllowDBNull = false },
+                new DataColumn() { ColumnName = "IsAvailable", DataType = typeof(bool), AllowDBNull = true },
+                new DataColumn() { ColumnName = "PriceInMarket", DataType = typeof(decimal), AllowDBNull = true },
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
         private static bool AreColumnsSetEquals(DataColumnCollection columnsUnderTest, DataColumnCollection expectedColumns)
         {
             for (var index = 0; index < expectedColumns.Count; index++)

@@ -34,8 +34,7 @@ namespace Umbrella.Expr.Rewritters
             }
             else if (type.IsClass || type.IsStruct())
             {
-                ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
-                NewExpression ne = Expression.New(constructor);
+                NewExpression ne = Expression.New(type);
 
                 PropertyInfo[] properties = type.GetProperties().Where(pr => pr.CanWrite && pr.PropertyType.IsBuiltInType()).ToArray();
                 List<MemberBinding> memberBindings = new List<MemberBinding>();

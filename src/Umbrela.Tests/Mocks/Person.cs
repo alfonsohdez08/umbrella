@@ -12,6 +12,7 @@ namespace Umbrella.Tests.Mocks
         public DateTime DateOfBirth { get; set; }
         public short Age => short.Parse((DateTime.Now - DateOfBirth).ToString("yy"));
         public bool IsAlive { get; set; }
+        public bool? HasChildren { get; set; }
         public SSN SSN { get; set; }
     }
 
