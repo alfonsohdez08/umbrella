@@ -107,8 +107,6 @@ namespace Umbrella.Tests.Datatable
         {
             Expression<Func<Person, dynamic>> projector =
                 p => new { Name = p.FirstName + " " + p.LastName, IsGettingTaxes = new TaxService().IsIncomingTaxSeason() };
-            //Expression<Func<Person, dynamic>> projector =
-            //    p => new { Name = ColumnSettings.Build(() => p.FirstName + " " + p.LastName).Name("F. Name"), IsGettingTaxes = new TaxService().IsIncomingTaxSeason() };
 
             DataTable dataTable = _people.ToDataTable(projector);
 
@@ -181,48 +179,5 @@ namespace Umbrella.Tests.Datatable
             return mapperDelegate.DynamicInvoke();
         }
 
-        private class ProjectorParameterReplacer: ExpressionVisitor
-        {
-            private readonly ParameterExpression _parameter;
-            private readonly object _instance;
-            
-            private ProjectorParameterReplacer(ParameterExpression parameter, object instance)
-            {
-                _parameter = parameter;
-                _instance = instance;
-            }
-
-            public static Expression Replace(Expression mapper, ParameterExpression parameter, object instance)
-            {
-                var projectorParameterReplacer = new ProjectorParameterReplacer(parameter, instance);
-                
-                return projectorParameterReplacer.Visit(mapper);
-            }
-
-
-            protected override Expression VisitParameter(ParameterExpression p)
-            {
-                if (p == _parameter)
-                    return Expression.Constant(_instance, p.Type);
-
-                return p;
-            }
-        }
-
-        //private static LambdaExpression StripColumnSettings(LambdaExpression lambdaExp)
-        //{
-        //    var columnSettingsEvaluator = new ColumnSettingsEvaluator();
-        //    var lambdaPartiallyEval = (LambdaExpression)columnSettingsEvaluator.Evaluate(lambdaExp);
-
-
-
-        //    throw new NotImplementedException();
-        //}
-
-        //private class ProjectionVisitor: ExpressionVisitor
-        //{
-
-
-        //}
     }
 }
