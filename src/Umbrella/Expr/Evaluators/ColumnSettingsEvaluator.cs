@@ -18,8 +18,7 @@ namespace Umbrella.Expr.Evaluators
                 var expQuoted = (UnaryExpression)mc.Arguments[0];
                 var mapperLambdaExp = (LambdaExpression)expQuoted.Operand;
 
-                //var columnSettings = typeof(ColumnSettings).GetMethod("Build").MakeGenericMethod(mapperLambdaExp.Body.Type).Invoke(null, new object[] { mapperLambdaExp });
-                var columnSettings = new ColumnSettings(mapperLambdaExp);
+                var columnSettings = typeof(ColumnSettings).GetMethod("Build").MakeGenericMethod(mapperLambdaExp.Body.Type).Invoke(null, new object[] { mapperLambdaExp });
 
                 return Expression.Constant(columnSettings, typeof(ColumnSettings));
             }

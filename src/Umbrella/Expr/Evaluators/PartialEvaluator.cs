@@ -62,8 +62,7 @@ namespace Umbrella.Expr.Evaluators
             }
             else if (_nominees.Contains(mi.NewExpression))
             {
-                // Evaluates partially the MemberInitExpression subtree (it checks for the constructor call arguments and the member bindings)
-
+                // Evaluates the constructor arguments and the members initialized
                 ReadOnlyCollection<Expression> newExpArgs = Visit(mi.NewExpression.Arguments, Visit);
                 NewExpression newExp = null;
 

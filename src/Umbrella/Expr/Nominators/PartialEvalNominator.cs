@@ -10,10 +10,10 @@ namespace Umbrella.Expr.Nominators
     {
         private ParameterExpression _parameter;
         private HashSet<Expression> _nominees;
-        private bool _isEvaluableLocally = true;
+        private bool _isEvaluable = true;
 
         /// <summary>
-        /// Nominates subtrees that do not reference an specific parameter (it's usually used for a LambdaExpression parameter).
+        /// Nominates subtrees that do not reference an specific parameter.
         /// </summary>
         /// <param name="expression">Expression tree (lambda expression).</param>
         /// <returns>A set of potential nodes that can be evaluated.</returns>
@@ -46,20 +46,20 @@ namespace Umbrella.Expr.Nominators
             if (node == null)
                 return node;
 
-            bool saveIsEvaluableLocally = _isEvaluableLocally;
-            _isEvaluableLocally = true;
+            bool saveIsEvaluable = _isEvaluable;
+            _isEvaluable = true;
 
             base.Visit(node);
 
-            if (_isEvaluableLocally)
+            if (_isEvaluable)
             {
                 if (node is ParameterExpression parameter && parameter == _parameter)
-                    _isEvaluableLocally = false;
+                    _isEvaluable = false;
                 else
                     _nominees.Add(node);
             }
 
-            _isEvaluableLocally &= saveIsEvaluableLocally;
+            _isEvaluable &= saveIsEvaluable;
 
             return node;
         }

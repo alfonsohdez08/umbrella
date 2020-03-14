@@ -30,7 +30,7 @@ namespace Umbrella
         /// </summary>
         internal Type ColumnDataType => _columnDataType;
 
-        internal ColumnSettings(Expression mapper)
+        private ColumnSettings(Expression mapper)
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));

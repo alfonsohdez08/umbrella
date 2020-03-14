@@ -23,7 +23,7 @@ namespace Umbrella.Expr.Projection
 
             if (!compositeTypeVisitor.IsProjectingACompositeType)
             {
-                // It means it's a single member projection, so it checks if the ColumnSettings has a name set
+                // It's a single member projection, so it checks if the ColumnSettings has a name set
                 var columnSettingsProjValidator = new ColumnSettingsNameValidator();
                 columnSettingsProjValidator.Validate(expression);
             }
