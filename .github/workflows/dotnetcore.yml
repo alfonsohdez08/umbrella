@@ -20,4 +20,4 @@ jobs:
     - name: Build with dotnet
       run: dotnet build ./src/Umbrella.sln --configuration Debug
     - name: Run tests with dotnet
-      run: dotnet test ./src/Umbrela.Tests.csproj --no-build
+      run: dotnet test ./src/Umbrella.Tests/Umbrella.Tests.csproj --no-build
