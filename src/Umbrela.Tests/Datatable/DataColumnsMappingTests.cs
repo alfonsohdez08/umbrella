@@ -73,6 +73,21 @@ namespace Umbrella.Tests.Datatable
             Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
+        [Fact(DisplayName = "When it's an implicit projection of an anonymous type, it should generate columns based on the anonymous type properties.")]
+        public void ToDataTable_ProjectToAnonymousTypeParameter_ShouldGenerateDataTableColumnsBasedOntheWritableProperties()
+        {
+            DataColumnCollection columns = _people.Select(p => new { p.Id, p.HasChildren}).ToDataTable(p => p).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "Id", DataType = typeof(Person).GetProperty("Id").PropertyType, AllowDBNull = false },
+                new DataColumn() { ColumnName = "HasChildren", DataType = Nullable.GetUnderlyingType(typeof(Person).GetProperty("HasChildren").PropertyType), AllowDBNull = true }
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
         [Fact(DisplayName = "When it's an projection that only has a member access without a new operator, it should generate a column based on the member accessed.")]
         public void ToDataTable_ProjectToAMemberAccess_ShouldGenerateColumnBasedOnTheMemberAccessed()
         {
