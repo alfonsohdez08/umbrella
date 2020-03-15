@@ -27,4 +27,4 @@ jobs:
       if: github.ref == 'refs/heads/master'
       run: dotnet nuget push ./src/Umbrella/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
     - name: echo ref
-      run: echo github.ref
+      run: echo ${{github.ref}}
