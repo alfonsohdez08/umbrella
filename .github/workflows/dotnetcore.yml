@@ -17,9 +17,9 @@ jobs:
       with:
         dotnet-version: 3.1.101
     - name: Build solution
-      run: dotnet build ./src/Umbrella.sln --configuration Release
+      run: dotnet build ./Umbrella.sln --configuration Release
     - name: Run tests
-      run: dotnet test ./src/Umbrella.Tests/Umbrella.Tests.csproj --configuration Release --no-build 
+      run: dotnet test ./test/Umbrella.Tests/Umbrella.Tests.csproj --configuration Release --no-build 
     - name: Package as NuGet package
       if: github.ref == 'refs/heads/master'
       run: dotnet pack ./src/Umbrella/Umbrella.csproj --configuration Release --no-build -o ./src/Umbrella
