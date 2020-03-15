@@ -1,4 +1,4 @@
-﻿namespace Umbrella.Tests.Mocks
+﻿namespace Umbrella.Tests.Stubs
 {
     public class Place
     {

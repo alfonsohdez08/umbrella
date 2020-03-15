@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using Umbrella.Expr.Column;
 using Umbrella.Tests.Helpers;
-using Umbrella.Tests.Mocks;
+using Umbrella.Tests.Stubs;
 using Xunit;
 
 namespace Umbrella.Tests.Expr
