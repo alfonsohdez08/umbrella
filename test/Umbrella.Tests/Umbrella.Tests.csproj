@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Umbrella\Umbrella.csproj" />
+    <ProjectReference Include="..\..\src\Umbrella\Umbrella.csproj" />
   </ItemGroup>
 
 </Project>
