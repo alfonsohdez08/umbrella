@@ -278,6 +278,39 @@ namespace Umbrella.Tests.Datatable
             Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
+        [Fact(DisplayName = "When it's a projection that only has a ColumnSettings in it, it should generate the column with no issue.")]
+        public void ToDataTable_ProjectionThatOnlyHasAColumnSettingsInIt_ShouldGenerateTheColumnWithNoIssue()
+        {
+            Expression<Func<Person, dynamic>> projector = p => new { DOB1 = ColumnSettings.Build(() => p.DateOfBirth).Name("DOB")};
+
+            DataColumnCollection columns = _people.ToDataTable(projector).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "DOB", DataType = typeof(DateTime), AllowDBNull = false }
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
+        [Fact(DisplayName = "When it's a single projection that has a ColumnSettings in it, it should generate the column with no issue.")]
+        public void ToDataTable_SingleProjectionThatUsesAColumnSettingInIt_ShouldGenerateTheColumnWithNoIssue()
+        {
+            var ids = new List<int>() { 1, 2 };
+            Expression<Func<int, dynamic>> projector = i => ColumnSettings.Build(() => i).Name("Id");
+
+            DataColumnCollection columns = ids.ToDataTable(projector).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "Id", DataType = typeof(int), AllowDBNull = false }
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
         private static bool AreColumnsSetEquals(DataColumnCollection columnsUnderTest, DataColumnCollection expectedColumns)
         {
             if (columnsUnderTest.Count != expectedColumns.Count)
