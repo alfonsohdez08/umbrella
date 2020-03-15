@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
     <PackageReference Include="Umbrella.DataTable" Version="1.0.2-alpha" />
   </ItemGroup>
 

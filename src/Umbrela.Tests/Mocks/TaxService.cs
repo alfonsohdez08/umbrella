@@ -12,6 +12,6 @@ namespace Umbrella.Tests.Mocks
 
         public static string GetClosestTaxCounselor() => "Redfield Services";
 
-        public static bool IsTaxAvailable(int personId) => personId % 2 != 0 ? true : false;
+        public static bool IsTaxAvailable(int personId) => personId % 2 != 0;
     }
 }

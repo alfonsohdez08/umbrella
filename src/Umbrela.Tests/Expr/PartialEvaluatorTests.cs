@@ -6,6 +6,7 @@ using Umbrella.Expr.Evaluators;
 using Umbrella.Expr.Projection;
 using Umbrella.Tests.Mocks;
 using Xunit;
+using Umbrella.Tests.Helpers;
 
 namespace Umbrella.Tests.Expr
 {
