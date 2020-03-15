@@ -2,13 +2,12 @@ name: Umbrella
 
 on:
   push:
-    branches: [ master ]
+     branches: [ master ]
   pull_request:
     branches: [ master ]
 
 jobs:
-  build:
-
+  build_and_deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,5 +16,13 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-    - name: Build with dotnet
+    - name: Build solution
       run: dotnet build ./src/Umbrella.sln --configuration Release
+    - name: Run tests
+      run: dotnet test ./src/Umbrella.Tests/Umbrella.Tests.csproj --configuration Release --no-build 
+    - name: Package as NuGet package
+      if: github.ref == 'master'
+      run: dotnet pack ./src/Umbrella/Umbrella.csproj --configuration Release --no-build
+    - name: Publish package to NuGet
+      if: github.ref == 'master'
+      run: dotnet nuget push ./src/Umbrella/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
