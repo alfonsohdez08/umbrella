@@ -11,7 +11,7 @@ namespace Umbrella
         /// <summary>
         /// Converts an IEnumerable instance to a DataTable.
         /// </summary>
-        /// <typeparam name="TEntity">Type that holds the set (the type parameter of an IEnumerable<>).</typeparam>
+        /// <typeparam name="TEntity">Type that holds the set (the type parameter of the IEnumerable<>).</typeparam>
         /// <typeparam name="TProjection">Type produced by the projector.</typeparam>
         /// <param name="source">Dataset.</param>
         /// <param name="projector">Projects a structure that defines the columns of the DataTable and how the data would be mapped into it (mapping expressions).</param>

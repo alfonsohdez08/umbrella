@@ -32,7 +32,7 @@ namespace Umbrella
         }
 
         /// <summary>
-        /// Modify a projector for make it understandable to the columns mapping process.
+        /// Modifies a projector that would be understandable by the columns mapping process.
         /// </summary>
         /// <param name="projector">Projector.</param>
         /// <returns>A projector that can be used by the columns mapping process for discover the DataTable columns.</returns>
@@ -56,8 +56,6 @@ namespace Umbrella
             var memberAccessProjRewritter = new SingleMemberProjectionRewritter();
             projector = (LambdaExpression)memberAccessProjRewritter.Rewrite(projector);
 
-            // Checks if the projection is valid or not (if it's invalid, an exception would be
-            // thrown to the client)
             var projectionValidator = new ProjectionValidator();
             projectionValidator.Validate(projector);
 

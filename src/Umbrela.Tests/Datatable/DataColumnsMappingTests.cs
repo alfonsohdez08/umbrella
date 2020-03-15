@@ -17,7 +17,7 @@ namespace Umbrella.Tests.Datatable
 
 
         [Fact(DisplayName = "When projects to an anonymous type, it should generate columns based on the properties projected.")]
-        public void ToDataTable_ProjectToAnonymousType_ShouldGenerateDataTableColumnsBasedOnTheProjectionProperties()
+        public void ToDataTable_ProjectToAnonymousType_ShouldGenerateDataTableColumnsBasedOnThePropertiesProjected()
         {
             Expression<Func<Person, dynamic>> projector = p => new { ID = p.Id, p.FirstName, p.LastName, DOB = p.DateOfBirth };
 
@@ -36,7 +36,7 @@ namespace Umbrella.Tests.Datatable
         }
 
         [Fact(DisplayName = "When projects to an user defined type, it should generate columns based on the members initialized.")]
-        public void ToDataTable_ProjectToUserDefinedType_ShouldGenerateDataTableColumnsWhereItsColumnsArePropertiesInitialized()
+        public void ToDataTable_ProjectToUserDefinedType_ShouldGenerateDataTableColumnsWhereItsColumnsAreThePropertiesInitialized()
         {
             Expression<Func<Person, dynamic>> projector = p => new Person() { Id = p.Id, IsAlive = p.IsAlive };
 
@@ -53,9 +53,9 @@ namespace Umbrella.Tests.Datatable
         }
 
         [Fact(DisplayName = "When it's an implicit projection of an user defined type, it should generate columns based on the built-in type and writable properties.")]
-        public void ToDataTable_ProjectToParameter_ShouldImplicitilyGenerateADataTableColumnsBasedOnParameterTypeProperties()
+        public void ToDataTable_ProjectToUserDefinedTypeParameter_ShouldGenerateDataTableColumnsBasedOntheWritableProperties()
         {
-            Expression<Func<Person, dynamic>> projector = p => p;
+            Expression<Func<Person, Person>> projector = p => p;
 
             DataColumnCollection columns = _people.ToDataTable(projector).Columns;
 
@@ -65,7 +65,8 @@ namespace Umbrella.Tests.Datatable
                 new DataColumn() { ColumnName = "FirstName", DataType = typeof(Person).GetProperty("FirstName").PropertyType, AllowDBNull = true },
                 new DataColumn() { ColumnName = "LastName", DataType = typeof(Person).GetProperty("LastName").PropertyType, AllowDBNull = true },
                 new DataColumn() { ColumnName = "DateOfBirth", DataType = typeof(Person).GetProperty("DateOfBirth").PropertyType, AllowDBNull = false },
-                new DataColumn() { ColumnName = "IsAlive", DataType = typeof(Person).GetProperty("IsAlive").PropertyType, AllowDBNull = false }
+                new DataColumn() { ColumnName = "IsAlive", DataType = typeof(Person).GetProperty("IsAlive").PropertyType, AllowDBNull = false },
+                new DataColumn() { ColumnName = "HasChildren", DataType = Nullable.GetUnderlyingType(typeof(Person).GetProperty("HasChildren").PropertyType), AllowDBNull = true }
                 }
             );
 
@@ -245,8 +246,28 @@ namespace Umbrella.Tests.Datatable
             Assert.True(AreColumnsSetEquals(columns, expectedColumns));
         }
 
+        [Fact(DisplayName = "When a projection receives a primitive and output an object, it generate columns based on the expressions declared within the projection.")]
+        public void ToDatatable_ProjectorThatHasAsInputAPrimitiveAndProjectsAnObject_ShouldGenerateColumnsBasedOnTheExpressionsDeclared()
+        {
+            var ids = new List<long>() { 1, 2, 3, 4, 5 };
+            Expression<Func<long, dynamic>> projector = l => new { Id = l };
+
+            DataColumnCollection columns = ids.ToDataTable(projector).Columns;
+
+            DataColumnCollection expectedColumns = new DataTable().Columns;
+            expectedColumns.AddRange(new DataColumn[] {
+                new DataColumn() { ColumnName = "Id", DataType = typeof(long), AllowDBNull = false }
+                }
+            );
+
+            Assert.True(AreColumnsSetEquals(columns, expectedColumns));
+        }
+
         private static bool AreColumnsSetEquals(DataColumnCollection columnsUnderTest, DataColumnCollection expectedColumns)
         {
+            if (columnsUnderTest.Count != expectedColumns.Count)
+                return false;
+
             for (var index = 0; index < expectedColumns.Count; index++)
                 if (!AreColumnEquals(columnsUnderTest[index], expectedColumns[index]))
                     return false;

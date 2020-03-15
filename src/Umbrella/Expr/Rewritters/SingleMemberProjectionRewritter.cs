@@ -40,7 +40,6 @@ namespace Umbrella.Expr.Rewritters
 
                 if (_expressions.Count == 1)
                 {
-
                     MemberExpression memberExp = (MemberExpression)_expressions[0];
                     string propertyName = memberExp.Member.Name;
 
@@ -68,19 +67,11 @@ namespace Umbrella.Expr.Rewritters
             return Expression.Lambda(projection, lambda.Parameters);
         }
 
-        //protected override Expression VisitConstant(ConstantExpression c)
-        //{
-        //    if (c.Type == typeof(ColumnSettings))
-        //        _expressions.Add(c);
-
-        //    return c;
-        //}
-
         protected override Expression VisitMember(MemberExpression m)
         {
             // A member accessing chain is allowed: (Customer c) => c.Address.Name
 
-            // Only visits the top node of a member accessing
+            // Add the topmost member of a member accessing chain
             _expressions.Add(m);
 
             return m;

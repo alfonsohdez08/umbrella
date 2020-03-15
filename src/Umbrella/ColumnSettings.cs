@@ -30,13 +30,13 @@ namespace Umbrella
         /// </summary>
         internal Type ColumnDataType => _columnDataType;
 
-        private ColumnSettings(Expression mapper, Type columnDataType)
+        private ColumnSettings(Expression mapper)
         {
             if (mapper == null)
                 throw new ArgumentNullException(nameof(mapper));
 
             _mapper = mapper;
-            _columnDataType = columnDataType;
+            _columnDataType = ((LambdaExpression)mapper).Body.Type;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Umbrella
         /// <returns>A ColumnSettings instance.</returns>
         public static ColumnSettings Build<T>(Expression<Func<T>> columnProjector)
         {
-            var columnSettings = new ColumnSettings(columnProjector, typeof(T));
+            var columnSettings = new ColumnSettings(columnProjector);
 
             return columnSettings;
         }

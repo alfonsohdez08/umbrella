@@ -36,8 +36,10 @@ namespace Umbrella.Expr.Rewritters
             {
                 NewExpression ne = Expression.New(type);
 
-                PropertyInfo[] properties = type.GetProperties().Where(pr => pr.CanWrite && pr.PropertyType.IsBuiltInType()).ToArray();
-                List<MemberBinding> memberBindings = new List<MemberBinding>();
+                PropertyInfo[] properties = type.GetProperties()
+                    .Where(pr => pr.CanWrite && pr.PropertyType.IsBuiltInType())
+                    .ToArray();
+                var memberBindings = new List<MemberBinding>();
 
                 for (int index = 0; index < properties.Length; index++)
                 {

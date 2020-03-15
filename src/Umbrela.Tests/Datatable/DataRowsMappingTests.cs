@@ -41,7 +41,7 @@ namespace Umbrella.Tests.Datatable
         }
 
         [Fact(DisplayName = "When a projection has a property mapped to a compound expression, it should evaluate this compound expression and return the data according to the expression.")]
-        public void ToDataTable_ProjectionThatHasAPropertyMappedToACompositeExpression_ShouldEvaluateThisCompoundExpressionAndDumpTheDataAccordingToTheExpression()
+        public void ToDataTable_ProjectionThatHasAPropertyMappedToACompositeExpression_ShouldEvaluateTheCompoundExpressionAndDumpTheDataAccordingToTheExpression()
         {
             Expression<Func<Person, dynamic>> projector = p => new {FullName = p.FirstName + " " + p.LastName};
 
@@ -70,7 +70,7 @@ namespace Umbrella.Tests.Datatable
             );
         }
 
-        [Fact(DisplayName = "When projects to an user defined type, it should evaluate each expression that are mapped to each member.")]
+        [Fact(DisplayName = "When projects to an user defined type, it should evaluate each expression assigned to the member initialized.")]
         public void ToDataTable_ProjectToAnUserDefinedType_ShouldGenerateADtWhereTheRowsValuesAreEqualToTheInputCollection()
         {
             Expression<Func<Person, dynamic>> projector = p => new Person() { DateOfBirth = p.DateOfBirth };
@@ -149,6 +149,24 @@ namespace Umbrella.Tests.Datatable
                 _people.Select(projector.Compile()).ToList(), // when compiles the lambda expression, all the projector parameter references are closured
                 (d, p) => (string)ExecuteMapper(p.Name.Mapper) == (string)d["F. Name"] && 
                     p.IsGettingTaxes == (bool)d["IsGettingTaxes"]
+                )
+            );
+        }
+
+        [Fact(DisplayName = "When a projection receives a primitive and output an object, it should dump the data based on the expressions declared within the projection.")]
+        public void ToDatatable_ProjectorThatHasAsInputAPrimitiveAndProjectsAnObject_ShouldDumpTheDataBasedOnTheExpressionsSetWithinTheProjection()
+        {
+            var ids = new List<long>() { 1, 2, 3, 4, 5 };
+
+            Expression<Func<long, dynamic>> projector = l => new { Id = l };
+
+            DataTable dataTable = ids.ToDataTable(projector);
+
+            Assert.True(
+                AreDataSetEquals(
+                    dataTable,
+                    ids.Select(projector.Compile()).ToList(),
+                    (d, l) => (long)d["Id"] == l.Id
                 )
             );
         }

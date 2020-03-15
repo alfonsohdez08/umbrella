@@ -25,8 +25,8 @@ namespace Umbrella.Expr.Projection
                 _projection = expression;
                 Visit(expression);
 
-                if (_newExpInScope == null)
-                    throw new InvalidProjectionException("The projection does not denote an object construction.", expression);
+                //if (_newExpInScope == null)
+                //    throw new InvalidProjectionException("The projection does not denote an object construction.", expression);
             }
             finally
             {

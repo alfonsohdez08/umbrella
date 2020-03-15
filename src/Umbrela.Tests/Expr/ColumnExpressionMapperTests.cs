@@ -45,7 +45,7 @@ namespace Umbrella.Tests.Expr
             Assert.False(newExpArgs.Length != columnExpressions.Length, $"Expected {newExpArgs.Length} columns mapped, but instead {columnExpressions.Length} columns were mapped.");
 
             for (int index = 0; index < newExpArgs.Length; index++)
-                Assert.True(newExpArgs[index] == columnExpressions[index].ColumnMapper, $"Dismatch between expressions mapped. Expected: {newExpArgs[index]} ; Mapped: {columnExpressions[index].ColumnMapper}");
+                Assert.False(newExpArgs[index] != columnExpressions[index].ColumnMapper, $"Dismatch between expressions mapped. Expected: {newExpArgs[index]} ; Mapped: {columnExpressions[index].ColumnMapper}");
         }
 
         [Fact(DisplayName = "When projects to an user defined type that only initialize a member, it should mark the member assignment as a column within the projection.")]
@@ -82,7 +82,7 @@ namespace Umbrella.Tests.Expr
             Assert.False(bindingExpressions.Length != columnExpressions.Length, $"Expected {bindingExpressions.Length} columns mapped, but instead {columnExpressions.Length} columns were mapped.");
 
             for (int index = 0; index < bindingExpressions.Length; index++)
-                Assert.True(bindingExpressions[index] == columnExpressions[index].ColumnMapper, $"Dismatch between expressions mapped. Expected: {bindingExpressions[index]} ; Mapped: {columnExpressions[index].ColumnMapper}");
+                Assert.False(bindingExpressions[index] != columnExpressions[index].ColumnMapper, $"Dismatch between expressions mapped. Expected: {bindingExpressions[index]} ; Mapped: {columnExpressions[index].ColumnMapper}");
 
         }
 
@@ -99,20 +99,6 @@ namespace Umbrella.Tests.Expr
             List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
 
             Assert.True(columnExpressions.Count == 0);
-        }
-
-        [Fact(DisplayName = "When projection is a member access, it should mark the member access as a column within the projection.")]
-        public void Map_PassAMemberAccessAsProjection_ShouldMapToColumnExpression()
-        {
-            Expression<Func<Person, int>> projector = p => p.Id;
-
-            Expression projectorMapped = _columnExpressionMapper.Map(projector);
-
-            var memberExpression = (MemberExpression)projector.Body;
-
-            List<ColumnExpression> columnExpressions = new ColumnExpressionsFetcher().FetchAll(projectorMapped);
-
-            Assert.True(memberExpression == columnExpressions[0].ColumnMapper);
         }
     }
 }
