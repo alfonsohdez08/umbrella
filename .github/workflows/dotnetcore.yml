@@ -23,7 +23,6 @@ jobs:
     - name: Package as NuGet package
       if: github.ref == 'master'
       run: dotnet pack ./src/Umbrella/Umbrella.csproj --configuration Release --no-build
-    - name: Push package to NuGet
+    - name: Publish package to NuGet
       if: github.ref == 'master'
-      run: echo worked
-      #run: dotnet nuget push ./src/Umbrella/*.nupkg -s https://api.nuget.org/v3/index.json -k '{{ secrets.NUGET_API_KEY }}'
+      run: dotnet nuget push ./src/Umbrella/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
