@@ -21,8 +21,10 @@ jobs:
     - name: Run tests
       run: dotnet test ./src/Umbrella.Tests/Umbrella.Tests.csproj --configuration Release --no-build 
     - name: Package as NuGet package
-      if: github.ref == 'master'
+      if: github.ref == 'refs/heads/master'
       run: dotnet pack ./src/Umbrella/Umbrella.csproj --configuration Release --no-build
     - name: Publish package to NuGet
-      if: github.ref == 'master'
+      if: github.ref == 'refs/heads/master'
       run: dotnet nuget push ./src/Umbrella/*.nupkg -s https://api.nuget.org/v3/index.json -k ${{ secrets.NUGET_API_KEY }}
+    - name: echo ref
+      run: echo ${{github.ref}}
