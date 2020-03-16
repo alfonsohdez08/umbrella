@@ -1,4 +1,7 @@
-# Overview
+# Umbrella
+
+![Umbrella](https://github.com/alfonsohdez08/umbrella/workflows/Umbrella/badge.svg?branch=master)
+
 
 Umbrella is a simple library that add the capability of convert an `IEnumerable` instance to a `DataTable` by using [C# projections](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/projection-operations). This saves the time of creating boilerplate code for define the `DataTable` columns and map your data into the `DataTable`.
 
