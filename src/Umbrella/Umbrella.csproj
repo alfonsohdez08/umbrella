@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <PackageId>Umbrella.DataTable</PackageId>
     <Authors>Alfonso Hernandez</Authors>
     <Company>n/a</Company>
@@ -10,7 +10,7 @@
     <Description>Adds the capability of convert an IEnumerable instance to a DataTable.</Description>
     <PackageTags>datatable expression-tree system.data</PackageTags>
     <RepositoryUrl>https://github.com/alfonsohdez08/umbrella</RepositoryUrl>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes>- Include documentation of all the usable components from this library.</PackageReleaseNotes>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression></PackageLicenseExpression>

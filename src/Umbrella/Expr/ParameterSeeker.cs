@@ -5,7 +5,7 @@ namespace Umbrella.Expr
     /// <summary>
     /// Seeker for expression parameters.
     /// </summary>
-    public class ParameterSeeker: ExpressionVisitor
+    internal class ParameterSeeker: ExpressionVisitor
     {
         private ParameterExpression _parameter;
         private bool _foundParameter = false;
