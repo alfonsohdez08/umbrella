@@ -100,6 +100,7 @@ namespace Umbrella.Tests.Expr
                 action();
             }catch(TException e)
             {
+                // Workaround due to the lack of Assert.Fail
                 Assert.True(false, $"Failed because an exception of type {typeof(TException).Name} was thrown.");
             }
         }

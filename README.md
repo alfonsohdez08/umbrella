@@ -1,9 +1,20 @@
 # Umbrella
 
 ![Umbrella](https://github.com/alfonsohdez08/umbrella/workflows/Umbrella/badge.svg?branch=master)
-
+[![Nuget](https://img.shields.io/nuget/v/Umbrella.DataTable)](https://www.nuget.org/packages/Umbrella.DataTable)
 
 Umbrella is a simple library that add the capability of convert an `IEnumerable` instance to a `DataTable` by using [C# projections](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/projection-operations). This saves the time of creating boilerplate code for define the `DataTable` columns and map your data into the `DataTable`.
+
+## Table of Content
+
+- [Installation](#Installation)
+- [Usage](#Usage)
+    * [Column Settings](#Column-Settings)
+        * [Methods](#Methods)
+    * [Projections](#Projections)
+        * [Projections Cheatsheet](#Varieties-of-projections-(Cheatsheet))
+- [How it works?](#How-it-works?)
+- [Why you would use this library?](#Why-you-would-use-this-library?)
 
 ## Installation
 
@@ -15,7 +26,7 @@ Using Package Manager Console in Visual Studio:
 PM> Install-Package Umbrella.DataTable
 ````
 
-Using .NET CLI:
+Using .NET Core CLI:
 
 ````shell
 > dotnet add package Umbrella.DataTable
@@ -43,6 +54,7 @@ public class Order
 
 List<Order> orders = GetOrders();
 
+// Here's where Umbrella kicks in and creates your DataTable based on a projection
 DataTable ordersTable = orders.ToDataTable(o => new {ID = o.Id, NetAmount = o.Amount + o.Freight, p.IsShipped});
 ````
 
@@ -103,7 +115,7 @@ or
 ````csharp
 (Order o) => o.Id
 ````
->Note: your projection might have or not a `new` operator in it. In case it does not have it, you can project  **only one** member; you can't have multiple members projected tied with an operator different than `new`, like: `o.FirstName + " " + o.LastName`. This projection is invalid because it can't infer the column's name.
+>Note: your projection might have or not a `new` operator in it. In case it does not have it, you can project  **only one** member; you can't have multiple members projected tied with an operator different than `new`, like: `o.FirstName + " " + o.LastName` - this projection is invalid because it can't infer the column's name.
 
 #### A `DataTable` that has three columns and two of them are nullable
 
