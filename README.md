@@ -12,9 +12,9 @@ Umbrella is a simple library that add the capability of convert an `IEnumerable`
     * [Column Settings](#Column-Settings)
         * [Methods](#Methods)
     * [Projections](#Projections)
-        * [Projections Cheatsheet](#Varieties-of-projections-(Cheatsheet))
-- [How it works?](#How-it-works?)
-- [Why you would use this library?](#Why-you-would-use-this-library?)
+        * [Projections Cheatsheet](#Varieties-of-projections-Cheatsheet)
+- [How it works?](#How-it-works)
+- [Why you would use this library?](#Why-you-would-use-this-library)
 
 ## Installation
 
