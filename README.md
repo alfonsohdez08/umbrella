@@ -133,7 +133,7 @@ or
 | `(Order o) => o` | `Id`, `Description`, `Amount`, `Freight`, `IsShipped` | This is an **implicit projection**. A projection is implicit when you return the projector parameter instead of manipulate the members within the projection - the properties projected are the writable one. An implicit projection is *valid* when your parameter type is a composite type: `class` or `struct` |
 | `(Order o) => new Order(){Id = o.Id}` | `Id`| The members initialized are the taken as columns |
 | `(int i) => new {Identifier = i}` | `Identifier`| - |
-| `(Order o) =>` | `o.Id` | This is called a `single member projection` because it only projects a member. |
+| `(Order o) => o.Id` | `o.Id` | This would be a `single member projection` because it projects only one member. |
 
 >Ensure your projection is a flat -no nested projection, meaning no nested `new` operators- and the data types of each property is a [built-in type](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/built-in-types).
 
