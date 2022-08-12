@@ -163,7 +163,7 @@ The projector above is valid: it demands the creation of a `DataTable` that has 
 (int i) => i
 ````
 
-**Umbrella** can't translate this as a column because it's not even a composite type. It doesn't have state, properties, and so on. In case you want to produce a `DataTable` based on the given collection, then we have to wrap our field into an object by using the `new` operator:
+**Umbrella** can't translate this as a column because it's not even a composite type. It doesn't have properties, etc. In case you want to produce a `DataTable` based on the given collection, then we have to wrap our field into an object by using the `new` operator:
 
 ````csharp
 (int i) => new {ID = i}
@@ -171,7 +171,7 @@ The projector above is valid: it demands the creation of a `DataTable` that has 
 
 Now **Umbrella** sees that it should create a `DataTable` of a single column called `ID`.
 
->If your input type isn't a complex one, then ensure you use the `new` operator within the projection.
+>If your input type isn't a complex one, then ensure you use the `new` operator within the projection to create one.
 
 #### How the data is mapped to the `DataTable`?
 
